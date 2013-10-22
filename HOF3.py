@@ -38,4 +38,12 @@ class HOF3ClientFactory(ASCIIClientFactory):
         self.objects["pp02"] = PLCEnergisable( self, PLCUserMemory(610) )
         self.objects["pp03"] = PLCEnergisable( self, PLCUserMemory(620) )
 
+        self.objects["dpc01"] = PLCPIDController( self, PLCUserMemory(630) )
+        self.objects["pc01"] = PLCPIDController( self, PLCUserMemory(650) )
+        self.objects["pc02"] = PLCPIDController( self, PLCUserMemory(670) )
+        self.objects["pc05"] = PLCPIDController( self, PLCUserMemory(690) )
+        self.objects["rc01"] = PLCPIDController( self, PLCUserMemory(710) )
+
+
+
         

@@ -1,4 +1,5 @@
 from twisted.internet import defer
+import datetime
 import collections
 
 def PLCUserMemory(index):
@@ -6,6 +7,16 @@ def PLCUserMemory(index):
     assert index >= 1 and index <= 1024
     return index + 5121 # See page 229 of the ICC-402 manual
 
+
+def PLCJoin( deferreds ):
+    d = defer.gatherResults( deferreds )
+    def onResult(data):
+        result = collections.OrderedDict()
+        for x in data:
+            result.update(x)
+        return result
+    d.addCallback( onResult )
+    return d
 
 class PLCObject:
     def __init__(self, factory):
@@ -38,7 +49,7 @@ class PLCTime(PLCObject):
             data = [int(i) for i in data]     # convert to ints
             return datetime.datetime( *data ) # convert to datetime
              
-        result = gatherResults( deferreds )
+        result = defer.gatherResults( deferreds )
         result.addCallback( formatResult )
 
         return result
@@ -67,14 +78,49 @@ class PLCBitSet(PLCObject):
     def get(self):
         d = self._factory.instance.getRawRegister(self.address)
         def getResult(data):
-            assert data != "" # If this happens then you've probably got the wrong memeory address
+            assert data != "" # If this happens then you've probably got the wrong memory address
             word = int(data)
             mask = 1
-            setLabels = collections.OrderedDict()
+            result = collections.OrderedDict()
             for i in range(len(self.labels)):
-                setLabels[self.labels[i]] = (word & mask) > 0
+                result[self.labels[i]] = (word & mask) > 0
                 mask = mask << 1
-            return setLabels
+            return result
+        d.addCallback( getResult )
+        return d
+
+
+class PLCInt(PLCObject):
+    def __init__(self, factory, address, label):
+        PLCObject.__init__(self, factory)
+        self.address = address
+        self.label = label
+
+    def get(self):
+        d = self._factory.instance.getRegister(self.address)
+        def getResult(data):
+            assert data != "" # If this happens then you've probably got the wrong memory address
+            result = dict()
+            result[self.label] = int(data)
+            return result
+        d.addCallback( getResult )
+        return d
+    
+
+class PLCFixed(PLCObject):
+    def __init__(self, factory, address, decimalPlace, label):
+        PLCObject.__init__(self, factory)
+        self.address = address
+        self.decimalPlace = decimalPlace
+        self.label = label
+
+    def get(self):
+        d = self._factory.instance.getRegister(self.address)
+        def getResult(data):
+            assert data != "" # If this happens then you've probably got the wrong memeory address
+            result = dict()
+            result[self.label] = int(data)/float(10**self.decimalPlace)
+            return result
         d.addCallback( getResult )
         return d
 
@@ -109,3 +155,49 @@ class PLCEnergisable(PLCObject):
         d.addCallback( getResult )
         return d
         
+
+class PLCPIDController(PLCObject):
+    def __init__(self, factory, address):
+        PLCObject.__init__(self, factory)
+        self.addressStatus = address + 0
+        self.addressCommand = address + 1
+        self.addressState = address + 2
+        self.addressPV = address + 3
+        self.addressCV = address + 4
+        self.addressSP = address + 5
+        self.addressErr = address + 6
+        self.addressErrLast = address + 7
+        self.addressErrLastLast = address + 8
+        self.addressP = address + 9
+        self.addressI = address + 10
+        self.addressD = address + 11
+        self.addressAcc = address + 12
+        self.addressSPRampTarget = address + 13
+        self.addressSPRampRate = address + 14
+        self.addressSPRampMaxErr = address + 15
+        self.addressCVMax = address + 16
+        self.addressCVMaxDt = address + 17
+
+        self.labelsStatus = ["modeRev", "modeMan", "modePID", "modeSpRamp", "modeSpRampLast", 
+                             "progOutModePID", "modeManEnable", "autoInterlock", "manInterlock", 
+                             "setOutputInterlock", "pidInterlock", "spRampOFFInterlock", 
+                             "spRampONInterlock", "cvP"]    
+        self.labelsCommand = ["none","auto","manualOff","manualOn"]
+
+        self.status = PLCBitSet(self._factory, self.addressStatus, self.labelsStatus)
+
+        # The nmber of decimal places may need to be redefined (by the user?)
+        self.pv = PLCFixed(self._factory, self.addressPV, 2, "pv") 
+        self.cv = PLCFixed(self._factory, self.addressCV, 2, "cv") 
+        self.sp = PLCFixed(self._factory, self.addressSP, 2, "sp") 
+
+        self.p = PLCFixed(self._factory, self.addressP, 2, "p")
+
+    def get(self):
+        deferreds = []
+        deferreds.append( self.status.get() )
+        deferreds.append( self.pv.get() )
+        deferreds.append( self.cv.get() )
+        deferreds.append( self.sp.get() )
+        return PLCJoin( deferreds )
+            
