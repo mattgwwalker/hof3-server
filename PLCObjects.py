@@ -5,7 +5,7 @@ import collections
 def PLCUserMemory(index):
     index = int(index)
     assert index >= 1 and index <= 1024
-    return index + 5121 # See page 229 of the ICC-402 manual
+    return index + 5120 # See page 229 of the ICC-402 manual
 
 
 def PLCJoin( deferreds ):
@@ -105,6 +105,15 @@ class PLCInt(PLCObject):
             return result
         d.addCallback( getResult )
         return d
+
+    def set(self, value):
+        d = self._factory.instance.setRegister(self.address, value)
+        def getResult(data):
+            assert data == ""
+            return None
+        d.addCallback( getResult )
+        return d
+        
     
 
 class PLCFixed(PLCObject):
@@ -115,6 +124,7 @@ class PLCFixed(PLCObject):
         self.label = label
 
     def get(self):
+        assert self._factory.instance is not None
         d = self._factory.instance.getRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memeory address
@@ -123,6 +133,16 @@ class PLCFixed(PLCObject):
             return result
         d.addCallback( getResult )
         return d
+
+    def set(self, value):
+        assert self._factory.instance is not None
+        d = self._factory.instance.setRegister(self.address, value)
+        def getResult(data):
+            assert data == ""
+            return None
+        d.addCallback( getResult )
+        return d
+
 
     
 
@@ -186,12 +206,14 @@ class PLCPIDController(PLCObject):
 
         self.status = PLCBitSet(self._factory, self.addressStatus, self.labelsStatus)
 
-        # The nmber of decimal places may need to be redefined (by the user?)
+        # The number of decimal places may need to be redefined (by the user?)
         self.pv = PLCFixed(self._factory, self.addressPV, 2, "pv") 
         self.cv = PLCFixed(self._factory, self.addressCV, 2, "cv") 
         self.sp = PLCFixed(self._factory, self.addressSP, 2, "sp") 
 
         self.p = PLCFixed(self._factory, self.addressP, 2, "p")
+        self.i = PLCFixed(self._factory, self.addressI, 2, "i")
+        self.d = PLCFixed(self._factory, self.addressD, 2, "d")
 
     def get(self):
         deferreds = []
@@ -199,5 +221,8 @@ class PLCPIDController(PLCObject):
         deferreds.append( self.pv.get() )
         deferreds.append( self.cv.get() )
         deferreds.append( self.sp.get() )
+        deferreds.append( self.p.get() )
+        deferreds.append( self.i.get() )
+        deferreds.append( self.d.get() )
         return PLCJoin( deferreds )
             
