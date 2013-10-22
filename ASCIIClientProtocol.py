@@ -40,7 +40,7 @@ class ASCIIClientProtocol(LineReceiver):
     def getRegister(self, address):
         return self.addCommand("SR"+str(address)+"*\n")
 
-    def getRaw(self, address):
+    def getRawRegister(self, address):
         return self.addCommand("SU"+str(address)+"*\n")
         
     def setRegister(self, address, value):
@@ -81,39 +81,3 @@ class ASCIIClientFactory(protocol.ClientFactory):
         print "Connecting to PLC..."
 
 
-class PLCObject:
-    def __init__(self, factory):
-        self._factory = factory
-
-
-class PLCTime(PLCObject):
-    def __init__(self, factory):
-        PLCObject.__init__(self, factory)
-        self.year = None
-        self.month = None
-        self.day = None
-        self.hour = None
-        self.minute = None
-        self.second = None
-
-    def getTime(self):
-        deferreds = []
-
-        deferreds.append( self._factory.instance.getRegister(8244) ) # year
-        deferreds.append( self._factory.instance.getRegister(8243) ) # month
-        deferreds.append( self._factory.instance.getRegister(8242) ) # day
-        deferreds.append( self._factory.instance.getRegister(8240) ) # hour
-        deferreds.append( self._factory.instance.getRegister(8239) ) # minute
-        deferreds.append( self._factory.instance.getRegister(8238) ) # second
-
-        def formatResult(data):
-            assert len(data) == 6
-            data[0] = "20"+data[0]            # convert two-digit to four-digit year
-            data = [int(i) for i in data]     # convert to ints
-            return datetime.datetime( *data ) # convert to datetime
-             
-        result = gatherResults( deferreds )
-        result.addCallback( formatResult )
-
-        return result
-        

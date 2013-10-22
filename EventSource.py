@@ -1,4 +1,5 @@
-from ASCIIClientProtocol import ASCIIClientFactory, PLCTime
+from ASCIIClientProtocol import ASCIIClientFactory
+from PLCObjects import *
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
 from twisted.internet import task, defer
@@ -27,9 +28,23 @@ class EventSource(Resource):
             deferreds.append(d)
         if "time" in request.args:
             plcTime = PLCTime(self.plcClient)
-            d = plcTime.getTime()
+            d = plcTime.get()
             def onResult(data):
                 response["time"] = data.isoformat(' ')
+            d.addCallback(onResult)
+            deferreds.append(d)
+        if "bit" in request.args:
+            bit = PLCBit(self.plcClient, 249, 0)
+            d = bit.get()
+            def onResult(data):
+                response["bit"] = data
+            d.addCallback(onResult)
+            deferreds.append(d)
+        if "inputs" in request.args:
+            bitSet = PLCBitSet(self.plcClient, 249, ["DI1","DI2","DI3","DI4","DI5","DI6","DI7","DI8"])
+            d = bitSet.get()
+            def onResult(data):
+                response["inputs"] = data
             d.addCallback(onResult)
             deferreds.append(d)
 

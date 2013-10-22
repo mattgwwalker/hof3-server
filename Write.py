@@ -1,7 +1,7 @@
-from ASCIIClientProtocol import ASCIIClientFactory, PLCTime
+from ASCIIClientProtocol import ASCIIClientFactory
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
-from twisted.internet import task, defer
+#from twisted.internet import task, defer
 
 import json
 
