@@ -47,6 +47,15 @@ class EventSource(Resource):
                 response["inputs"] = data
             d.addCallback(onResult)
             deferreds.append(d)
+        if "dv01" in request.args:
+            dv01 = PLCEnergisable(self.plcClient, PLCUserMemory(400))
+            d = dv01.getStatus()
+            def onResult(data):
+                response["dv01"] = data
+            d.addCallback(onResult)
+            deferreds.append(d)
+            
+
 
         # Write event when all the data requested has been obtained
         def writeEvent(data):
