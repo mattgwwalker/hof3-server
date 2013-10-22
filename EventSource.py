@@ -8,14 +8,11 @@ import json
 
 class EventSource(Resource):
     isLeaf = True
-    def __init__(self, reactor):
-        # Create connection to PLC
-        self.factory = ASCIIClientFactory()
-        reactor.connectTCP("192.168.0.91", 10001, self.factory, 5)
-        
+    def __init__(self, plcClient):
+        self.plcClient = plcClient        
 
     def processEvent(self, request):
-        if self.factory.instance is None:
+        if self.plcClient.instance is None:
             return # nothing we can do yet
 
         # Obtain variables from query string
@@ -23,13 +20,13 @@ class EventSource(Resource):
         deferreds = []
         if "x" in request.args:
             address = request.args["x"][0]
-            d = self.factory.instance.getRegister(address)
+            d = self.plcClient.instance.getRegister(address)
             def onResult(data):
                 response["x"] = data
             d.addCallback(onResult)
             deferreds.append(d)
         if "time" in request.args:
-            plcTime = PLCTime(self.factory)
+            plcTime = PLCTime(self.plcClient)
             d = plcTime.getTime()
             def onResult(data):
                 response["time"] = data.isoformat(' ')
