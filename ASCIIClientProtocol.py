@@ -1,4 +1,4 @@
-from twisted.internet.defer import Deferred
+from twisted.internet.defer import Deferred, gatherResults
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
@@ -97,46 +97,23 @@ class PLCTime(PLCObject):
         self.second = None
 
     def getTime(self):
-        deferred = Deferred()
-        def returnResult():
-            if self.year and self.month and self.day and self.hour and self.minute and self.second:
-                deferred.callback( datetime.datetime(self.year, self.month, self.day, 
-                                                     self.hour, self.minute, self.second) )
-            
-        year = self._factory.instance.getRegister(8244)
-        def onYear(data):
-            self.year = int("20"+data) # Converts from two-digit to four-digit years
-            returnResult()
-        year.addCallback( onYear )
+        deferreds = []
 
-        month = self._factory.instance.getRegister(8243)
-        def onMonth(data):
-            self.month = int(data)
-            returnResult()
-        month.addCallback( onMonth )
+        deferreds.append( self._factory.instance.getRegister(8244) ) # year
+        deferreds.append( self._factory.instance.getRegister(8243) ) # month
+        deferreds.append( self._factory.instance.getRegister(8242) ) # day
+        deferreds.append( self._factory.instance.getRegister(8240) ) # hour
+        deferreds.append( self._factory.instance.getRegister(8239) ) # minute
+        deferreds.append( self._factory.instance.getRegister(8238) ) # second
 
-        day = self._factory.instance.getRegister(8242)
-        def onDay(data):
-            self.day = int(data)
-            returnResult()
-        day.addCallback( onDay )
+        def formatResult(data):
+            assert len(data) == 6
+            data[0] = "20"+data[0]            # convert two-digit to four-digit year
+            data = [int(i) for i in data]     # convert to ints
+            return datetime.datetime( *data ) # convert to datetime
+             
+        result = gatherResults( deferreds )
+        result.addCallback( formatResult )
 
-        hour = self._factory.instance.getRegister(8240)
-        def onHour(data):
-            self.hour = int(data)
-            returnResult()
-        hour.addCallback( onHour )
-
-        minute = self._factory.instance.getRegister(8239)
-        def onMinute(data):
-            self.minute = int(data)
-            returnResult()
-        minute.addCallback( onMinute )
-
-        second = self._factory.instance.getRegister(8238)
-        def onSecond(data):
-            self.second = int(data)
-            returnResult()
-        second.addCallback( onSecond )
-
-        return deferred
+        return result
+        
