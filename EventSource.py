@@ -49,6 +49,7 @@ class EventSource(Resource):
             d.addCallback(onResult)
             deferreds.append(d)
 
+        # Go through the objects in the PLC and check if they've been requested
         for name,obj in self.plcClient.objects.items():
             if name in request.args:
                 d = obj.get()
@@ -73,9 +74,14 @@ class EventSource(Resource):
 
     def render_GET(self, request):
         request.setHeader("Content-Type","text/event-stream");
-        #request.setHeader("Access-Control-Allow-Origin","*");
+
+        if "freq" in request.args:
+            freq = float(request.args["freq"][0])
+        else:
+            freq = 1 # Repeat every second by default
+
         loop = task.LoopingCall( lambda: self.processEvent(request) )
-        loop.start(1.0) # Repeat every second
+        loop.start(freq) 
 
         # Stop the loop if the connection is closed (e.g. by the client)
         def stopSending(reason):
