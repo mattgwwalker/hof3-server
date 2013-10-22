@@ -1,4 +1,5 @@
 from ASCIIClientProtocol import ASCIIClientFactory
+from PLCHOF3 import *
 from PLCObjects import *
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
@@ -47,13 +48,17 @@ class EventSource(Resource):
                 response["inputs"] = data
             d.addCallback(onResult)
             deferreds.append(d)
-        if "dv01" in request.args:
-            dv01 = PLCEnergisable(self.plcClient, PLCUserMemory(400))
-            d = dv01.getStatus()
-            def onResult(data):
-                response["dv01"] = data
-            d.addCallback(onResult)
-            deferreds.append(d)
+
+        for name,obj in self.plcClient.objects.items():
+            if name in request.args:
+                d = obj.get()
+                def make_onResult(n):
+                    def f(d):
+                        response[n] = d
+                    return f
+                onResult = make_onResult(name)
+                d.addCallback( onResult )
+                deferreds.append(d)
             
 
 
