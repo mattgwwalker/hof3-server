@@ -32,16 +32,23 @@ class PLCObject:
 class PLCTime(PLCObject):
     def __init__(self, factory):
         PLCObject.__init__(self, factory)
+        self.addressYear = 8244
+        self.addressMonth = 8243
+        self.addressDay = 8242
+        self.addressHour = 8240
+        self.addressMinute = 8239
+        self.addressSecond = 8238
+        
 
     def get(self):
         deferreds = []
 
-        deferreds.append( self._factory.instance.getRegister(8244) ) # year
-        deferreds.append( self._factory.instance.getRegister(8243) ) # month
-        deferreds.append( self._factory.instance.getRegister(8242) ) # day
-        deferreds.append( self._factory.instance.getRegister(8240) ) # hour
-        deferreds.append( self._factory.instance.getRegister(8239) ) # minute
-        deferreds.append( self._factory.instance.getRegister(8238) ) # second
+        deferreds.append( self._factory.instance.getRegister(self.addressYear) )
+        deferreds.append( self._factory.instance.getRegister(self.addressMonth) )
+        deferreds.append( self._factory.instance.getRegister(self.addressDay) )
+        deferreds.append( self._factory.instance.getRegister(self.addressHour) )
+        deferreds.append( self._factory.instance.getRegister(self.addressMinute) )
+        deferreds.append( self._factory.instance.getRegister(self.addressSecond) )
 
         def formatResult(data):
             assert len(data) == 6
@@ -53,7 +60,19 @@ class PLCTime(PLCObject):
         result.addCallback( formatResult )
 
         return result
-        
+
+    def set(self, value):
+        # Ignore value and set to current system time
+        now = datetime.datetime.now()
+        deferreds = []
+        deferreds.append( self._factory.instance.setRegister(self.addressYear, now.year%100) )
+        deferreds.append( self._factory.instance.setRegister(self.addressMonth, now.month) )
+        deferreds.append( self._factory.instance.setRegister(self.addressDay, now.day) )
+        deferreds.append( self._factory.instance.setRegister(self.addressHour, now.hour) )
+        deferreds.append( self._factory.instance.setRegister(self.addressMinute, now.minute) )
+        deferreds.append( self._factory.instance.setRegister(self.addressSecond, now.second) )
+        result = defer.gatherResults( deferreds )
+        return result
 
 class PLCBit(PLCObject):
     def __init__(self, factory, address, index):

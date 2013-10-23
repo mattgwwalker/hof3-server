@@ -5,6 +5,8 @@ from twisted.protocols.basic import LineReceiver
 from collections import deque
 import datetime
 
+from PLCObjects import PLCTime
+
 class ASCIIClientProtocol(LineReceiver):
     class Command:
         def __init__(self, string):
@@ -19,6 +21,11 @@ class ASCIIClientProtocol(LineReceiver):
 
     def connectionMade(self):
         print "A connection has been made to the PLC."
+        
+        # Set PLC time to server time
+        #plcTime = PLCTime(self._factory)
+        #plcTime.set(None) # Set PLC to current server time
+
 
     def connectionLost(self, reason):
         print "The connection to the PLC has been lost."
