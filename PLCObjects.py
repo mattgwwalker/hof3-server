@@ -21,12 +21,12 @@ def PLCJoin( deferreds ):
 class PLCObject:
     def __init__(self, factory):
         self._factory = factory
+        
+    def get(self):
+        raise NotImplementedError("get() has not been defined for this PLCObject")
 
-        def get(self):
-            raise NotImplementedError("get() has not been defined for this PLCObject")
-
-        def set(self):
-            raise NotImplementedError("set() has not been defined for this PLCObject")
+    def set(self):
+        raise NotImplementedError("set() has not been defined for this PLCObject")
 
 
 class PLCTime(PLCObject):
@@ -90,6 +90,7 @@ class PLCBitSet(PLCObject):
         return d
 
 
+
 class PLCInt(PLCObject):
     def __init__(self, factory, address, label):
         PLCObject.__init__(self, factory)
@@ -127,7 +128,7 @@ class PLCFixed(PLCObject):
         assert self._factory.instance is not None
         d = self._factory.instance.getRegister(self.address)
         def getResult(data):
-            assert data != "" # If this happens then you've probably got the wrong memeory address
+            assert data != "" # If this happens then you've probably got the wrong memory address
             result = dict()
             result[self.label] = int(data)/float(10**self.decimalPlace)
             return result
@@ -202,7 +203,7 @@ class PLCPIDController(PLCObject):
                              "progOutModePID", "modeManEnable", "autoInterlock", "manInterlock", 
                              "setOutputInterlock", "pidInterlock", "spRampOFFInterlock", 
                              "spRampONInterlock", "cvP"]    
-        self.labelsCommand = ["none","auto","manualOff","manualOn"]
+        self.labelsCommand = ["none","auto","manualSetOutput","manualPID"]
 
         self.status = PLCBitSet(self._factory, self.addressStatus, self.labelsStatus)
 
@@ -214,6 +215,8 @@ class PLCPIDController(PLCObject):
         self.p = PLCFixed(self._factory, self.addressP, 2, "p")
         self.i = PLCFixed(self._factory, self.addressI, 2, "i")
         self.d = PLCFixed(self._factory, self.addressD, 2, "d")
+
+        self.command = PLCInt(self._factory, self.addressCommand, "command")
 
     def get(self):
         deferreds = []
