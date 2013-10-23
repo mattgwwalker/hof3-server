@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Flot Test: EventSource-Based Graph</title>
+  <script src="js/jquery-1.9.1.js"></script>
+  <script src="js/flot/jquery.flot.js"></script>
+  <script src="js/flot/jquery.flot.time.js"></script>
+</head>
+<body>
+
+  <div id="header">
+    <h2>EventSource-Based Graph</h2>
+    </div>
+
+  <div id="content">
+
+    <div id="Graph" style="width:400px; height:400px;"></div>
+
+  </div>
+
+<script type="text/javascript">
+
+console.log("Creating EventSource...");
+var eventSource = new EventSource("events?pc01=1&time=1");
+console.log("EventSource created.");
+
+eventSource.onopen = function() {
+  console.log("EventSource is open.");
+};
+
+
+points = [];
+
+eventSource.onmessage = function(event) {
+  console.log("EventSource message recieved.");
+  //console.log("message:"+event.data);
+  var data = JSON.parse(event.data);
+  //console.log(data)
+  points.push([Date.parse(data.time), data.pc01.pv]);
+  while (points.length > 600) {
+    points.shift();
+  }
+  plot();
+};
+
+
+function plot() {
+  $.plot("#Graph", [points], {
+    // plot config
+    //yaxis: { min: 0, max: 1 }//,
+    //xaxis: { min: 0, max: 100 }
+    xaxis: { mode: "time", timezone: "browser",
+             minTickSize: [3, "second"]
+           },
+  });
+}
+
+</script>
+</body>
+</html>
