@@ -184,7 +184,7 @@ class PLCEnergisable(PLCObject):
         self.labelsStatus2 = ["eng","deeng","autoOut","delayedAutoOut","fault",
                               "engEnable","deengEnable","manEnable","faultResetEnable",
                               "autoInterlock","manInterlock","manOFFInterlock","manONInterlock"]
-        self.labelsCommand = ["none","auto","manualOff","manualOn"]
+        self.labelsCommand = ["none","auto","manual","manualOff","manualOn"]
 
     def get(self):
         status1 = PLCBitSet(self._factory, self.addressStatus1, self.labelsStatus1)
