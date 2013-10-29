@@ -43,12 +43,12 @@ class PLCTime(PLCObject):
     def getTime(self):
         deferreds = []
 
-        deferreds.append( self._factory.instance.getRegister(self.addressYear) )
-        deferreds.append( self._factory.instance.getRegister(self.addressMonth) )
-        deferreds.append( self._factory.instance.getRegister(self.addressDay) )
-        deferreds.append( self._factory.instance.getRegister(self.addressHour) )
-        deferreds.append( self._factory.instance.getRegister(self.addressMinute) )
-        deferreds.append( self._factory.instance.getRegister(self.addressSecond) )
+        deferreds.append( self._factory.getRegister(self.addressYear) )
+        deferreds.append( self._factory.getRegister(self.addressMonth) )
+        deferreds.append( self._factory.getRegister(self.addressDay) )
+        deferreds.append( self._factory.getRegister(self.addressHour) )
+        deferreds.append( self._factory.getRegister(self.addressMinute) )
+        deferreds.append( self._factory.getRegister(self.addressSecond) )
 
         def formatResult(data):
             assert len(data) == 6
@@ -97,12 +97,12 @@ class PLCTime(PLCObject):
         # Ignore value and set to current system time
         now = datetime.datetime.now()
         deferreds = []
-        deferreds.append( self._factory.instance.setRegister(self.addressYear, now.year%100) )
-        deferreds.append( self._factory.instance.setRegister(self.addressMonth, now.month) )
-        deferreds.append( self._factory.instance.setRegister(self.addressDay, now.day) )
-        deferreds.append( self._factory.instance.setRegister(self.addressHour, now.hour) )
-        deferreds.append( self._factory.instance.setRegister(self.addressMinute, now.minute) )
-        deferreds.append( self._factory.instance.setRegister(self.addressSecond, now.second) )
+        deferreds.append( self._factory.setRegister(self.addressYear, now.year%100) )
+        deferreds.append( self._factory.setRegister(self.addressMonth, now.month) )
+        deferreds.append( self._factory.setRegister(self.addressDay, now.day) )
+        deferreds.append( self._factory.setRegister(self.addressHour, now.hour) )
+        deferreds.append( self._factory.setRegister(self.addressMinute, now.minute) )
+        deferreds.append( self._factory.setRegister(self.addressSecond, now.second) )
         result = defer.gatherResults( deferreds )
         return result
 
@@ -113,7 +113,7 @@ class PLCBit(PLCObject):
         self.mask = 1 << index
         
     def get(self):
-        word = self._factory.instance.getRawRegister(self.address)
+        word = self._factory.getRawRegister(self.address)
         def getResult(data):
             return( int((int(data) & self.mask) > 0) )
         word.addCallback( getResult )
@@ -127,7 +127,7 @@ class PLCBitSet(PLCObject):
         self.labels = labels
         
     def get(self):
-        d = self._factory.instance.getRawRegister(self.address)
+        d = self._factory.getRawRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
             word = int(data)
@@ -149,7 +149,7 @@ class PLCInt(PLCObject):
         self.label = label
 
     def get(self):
-        d = self._factory.instance.getRegister(self.address)
+        d = self._factory.getRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
             result = dict()
@@ -159,7 +159,7 @@ class PLCInt(PLCObject):
         return d
 
     def set(self, value):
-        d = self._factory.instance.setRegister(self.address, value)
+        d = self._factory.setRegister(self.address, value)
         def getResult(data):
             assert data == ""
             return None
@@ -176,8 +176,7 @@ class PLCFixed(PLCObject):
         self.label = label
 
     def get(self):
-        assert self._factory.instance is not None
-        d = self._factory.instance.getRegister(self.address)
+        d = self._factory.getRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
             result = dict()
@@ -187,8 +186,7 @@ class PLCFixed(PLCObject):
         return d
 
     def set(self, value):
-        assert self._factory.instance is not None
-        d = self._factory.instance.setRegister(self.address, value)
+        d = self._factory.setRegister(self.address, value)
         def getResult(data):
             assert data == ""
             return None

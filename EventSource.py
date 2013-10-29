@@ -6,6 +6,7 @@ from twisted.web.server import NOT_DONE_YET
 from twisted.internet import task, defer
 
 import json
+import datetime
 
 
 class EventSource(Resource):
@@ -14,9 +15,6 @@ class EventSource(Resource):
         self.plcClient = plcClient        
 
     def processEvent(self, request):
-        if self.plcClient.instance is None:
-            return # nothing we can do yet
-
         # Obtain variables from query string
         response = {}
         deferreds = []
@@ -27,12 +25,12 @@ class EventSource(Resource):
                 response["x"] = data
             d.addCallback(onResult)
             deferreds.append(d)
-        if "time" in request.args:
+        if "plctime" in request.args:
             plcTime = PLCTime(self.plcClient)
             d = plcTime.get()
             def onResult(data):
                 response["time"] = data.isoformat() # The default 'T' character is 
-                                                    # important for Firefox
+                                                     # important for Firefox
             d.addCallback(onResult)
             deferreds.append(d)
         if "bit" in request.args:
@@ -62,10 +60,11 @@ class EventSource(Resource):
                 d.addCallback( onResult )
                 deferreds.append(d)
             
-
-
         # Write event when all the data requested has been obtained
         def writeEvent(data):
+            if "time" in request.args:
+                response["time"] = datetime.datetime.now().isoformat()
+            
             request.write("\nevent:\n")
             request.write("data: "+json.dumps(response)+"\n")
 
@@ -80,7 +79,7 @@ class EventSource(Resource):
         if "freq" in request.args:
             freq = float(request.args["freq"][0])
         else:
-            freq = 1.0 # Repeat every second by default
+            freq = 0.5 # Repeat every second by default
 
         loop = task.LoopingCall( lambda: self.processEvent(request) )
         loop.start(freq) 

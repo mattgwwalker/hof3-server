@@ -16,10 +16,13 @@ plc = HOF3ClientFactory()
 reactor.connectTCP("192.168.1.91", 10001, plc, 5)
 
 
+
         
 # Set PLC time to server time
-plcTime = PLCTime(plc)
-plcTime.set(None) # Set PLC to current server time
+plcTime = PLCTime(plc).get()
+plcTime2 = PLCTime(plc).get()
+#plcTime.set(None) # Set PLC to current server time
+
 
 
 
