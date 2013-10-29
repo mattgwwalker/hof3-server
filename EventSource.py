@@ -31,7 +31,8 @@ class EventSource(Resource):
             plcTime = PLCTime(self.plcClient)
             d = plcTime.get()
             def onResult(data):
-                response["time"] = data.isoformat(' ')
+                response["time"] = data.isoformat() # The default 'T' character is 
+                                                    # important for Firefox
             d.addCallback(onResult)
             deferreds.append(d)
         if "bit" in request.args:
@@ -73,12 +74,13 @@ class EventSource(Resource):
 
 
     def render_GET(self, request):
+        print "Received GET request for EventSource"
         request.setHeader("Content-Type","text/event-stream");
 
         if "freq" in request.args:
             freq = float(request.args["freq"][0])
         else:
-            freq = 1 # Repeat every second by default
+            freq = 1.0 # Repeat every second by default
 
         loop = task.LoopingCall( lambda: self.processEvent(request) )
         loop.start(freq) 

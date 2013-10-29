@@ -1,8 +1,23 @@
 
 var controllers = {
     "pc01" :        { id : "pc01",
-                      label : "PC01: Along-membrane pressure (P1 - P2)",
-                      pv : { label : "Along-membrane pressure (P1 - P2)",
+                      label : "PC01: Pump pressure slave (P1)",
+                      pv : { label : "Before membrane pressure (P1)",
+                             units : ["barg", " barg"],
+                             rounding : 2,
+                             id : "pv" },
+                      sp : { label : "Setpoint",
+                             units : ["barg", " barg"],
+                             rounding : 2,
+                             id : "sp" },
+                      cv : { label : "Pump 1 Speed",
+                             units : ["%", "%"],
+                             rounding : 1,
+                             id : "cv" } 
+                    },
+    "pc03" :        { id : "pc03",
+                      label : "PC03: Backflush pressure (P3) NOT WORKING",
+                      pv : { label : "Backflush pressure (P3)",
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "pv" },
@@ -10,14 +25,14 @@ var controllers = {
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "sp" },
-                      cv : { label : "Pump 1 Speed",
+                      cv : { label : "CV03",
                              units : ["%", "%"],
                              rounding : 1,
                              id : "cv" } 
                     },
     "pc05" :        { id : "pc05",
-                      label : "PC05: Trans-membrane pressure ((P1+P2)/2)",
-                      pv : { label : "Trans-membrane pressure ((P1+P2)/2)",
+                      label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3) NOT WORKING",
+                      pv : { label : "Trans-membrane pressure ((P1+P2)/2 - P3)",
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "pv" },
@@ -30,9 +45,9 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "pc02" :        { id : "pc02",
-                      label : "PC02: Backflush pressure (P3)",
-                      pv : { label : "Backflush pressure (P3)",
+    "dpc01" :       { id : "dpc05",
+                      label : "DPC05: Along-membrane controller (master controller for pump speed) NOT WORKING",
+                      pv : { label : "???",
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "pv" },
@@ -40,7 +55,22 @@ var controllers = {
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "sp" },
-                      cv : { label : "CV03",
+                      cv : { label : "CV01",
+                             units : ["%", "%"],
+                             rounding : 1,
+                             id : "cv" } 
+                    },
+    "rc01" :       { id : "rc01",
+                      label : "RC01: Retentate bleed controller NOT WORKING",
+                      pv : { label : "???",
+                             units : ["barg", " barg"],
+                             rounding : 1,
+                             id : "pv" },
+                      sp : { label : "Setpoint",
+                             units : ["barg", " barg"],
+                             rounding : 1,
+                             id : "sp" },
+                      cv : { label : "CV01",
                              units : ["%", "%"],
                              rounding : 1,
                              id : "cv" } 
@@ -199,16 +229,18 @@ function getPoints(event, controller) {
     var data = JSON.parse(event.data);
 
     var t = Date.parse(data.time);  // The factor of 1000 is to convert from unix time to javascript time
+    console.log("data.time:",data.time)
+    console.log("t:",t)
 
     // FIXME: the three multipliers below are for testing
     var pv = parseFloat( data[controller.id][controller.pv.id] );
     var sp = parseFloat( data[controller.id][controller.sp.id] );
     var cv = parseFloat( data[controller.id][controller.cv.id] );
 
-    //console.log("data:",data)
+    console.log("data:",data)
     //console.log("controller.id:", controller.id);
-    //console.log("data[controller.id]:", data[controller.id]);
-    //console.log("cv:",cv)
+    console.log("data[controller.id]:", data[controller.id]);
+    console.log("pv:",pv)
 
     updateText(pv, sp, cv);
     updatePoints(t, pv, sp, cv);
@@ -223,7 +255,7 @@ function plotGraph() {
     $.plot("#Graph", 
            // Series to plot
            [ { data: pointsPV,
-               label: "PV: ("+controller.pv.units[0]+")",
+               label: "PV ("+controller.pv.units[0]+")",
                color: "rgb(4,0,0)",
                shadowSize: 0,
                lines: { lineWidth: 3 } },
@@ -261,16 +293,39 @@ function plotGraph() {
 }
 
 
-// Page initialisation event
-$(document).on( "pageshow", "#ConfigurePID_Page", function(event) {
-    // Set the controller to the default "Choose a PID Controller" option
-    $("#ConfigurePID_Controller option:eq(0)").prop("selected", true);
-    $("#ConfigurePID_Controller").selectmenu("refresh");
+// Interface: Automatic button
+function onClickAutomaticBtn() {
+    // Hide the inputs for manual values
+    $("#ConfigurePID_ContainerNewTarget").hide();
+    $("#ConfigurePID_ContainerNewOutput").hide();
+}
 
-    var windowHeight = $(window).height();
-    var position = $("#Graph").position().top;
-    $("#Graph").css("height", windowHeight - position);
-});
+
+// Interface: Manual PID button
+function onClickManualPIDBtn() {
+    $("#ConfigurePID_ContainerNewTarget").show();
+    $("#ConfigurePID_ContainerNewOutput").hide();
+}
+
+
+// Interface: Manual Output button
+function onClickManualOutputBtn() {
+    $("#ConfigurePID_ContainerNewTarget").hide();
+    $("#ConfigurePID_ContainerNewOutput").show();
+}
+
+
+// Interface: Setpoint ramping
+function onClickSetpointRampingBtn() {
+    $("#ConfigurePID_ContainerRamping").show();
+}
+
+// Interface: Setpoint ramping
+function onClickImmediateSetpointChangesBtn() {
+    $("#ConfigurePID_ContainerRamping").hide();
+}
+
+
 
 // Page initialisation event
 $(document).on( "pageinit", "#ConfigurePID_Page", function(event) {
@@ -281,9 +336,34 @@ $(document).on( "pageinit", "#ConfigurePID_Page", function(event) {
         }
     }
 
-
     $("#ConfigurePID_Duration").change( onChangeDuration );
     $("#ConfigurePID_Controller").change( onChangeController );
     onChangeDuration();
+
+
+    $("#ConfigurePID_AutomaticBtn").click(onClickAutomaticBtn);
+    $("#ConfigurePID_ManualPIDBtn").click(onClickManualPIDBtn);
+    $("#ConfigurePID_ManualOutputBtn").click(onClickManualOutputBtn);
+    
+    $("#ConfigurePID_SetpointRampingBtn").click(onClickSetpointRampingBtn);
+    $("#ConfigurePID_ImmediateSetpointChangesBtn").click(onClickImmediateSetpointChangesBtn);
+
+});
+
+
+
+// Page show event
+$(document).on( "pageshow", "#ConfigurePID_Page", function(event) {
+    // Set the controller to the default "Choose a PID Controller" option
+    $("#ConfigurePID_Controller option:eq(0)").prop("selected", true);
+    $("#ConfigurePID_Controller").selectmenu("refresh");
+
+    // Set height of graph
+    var windowHeight = $(window).height();
+    var position = $("#Graph").position().top;
+    $("#Graph").css("height", windowHeight - position);
+
+    // Hide controller details until they're available
+    $("#ConfigurePID_ContainerControllerDetails").hide();
 });
 

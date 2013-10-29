@@ -33,6 +33,7 @@ class ASCIIClientProtocol(LineReceiver):
 
     def processCommand(self):
         if not self._busy:
+            print "Processing next command to PLC.  Queue size is ",len(self._commands)
             self._busy = True
             self._current = self._commands.popleft()
             self.transport.write( self._current.string )

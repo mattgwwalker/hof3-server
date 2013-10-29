@@ -10,7 +10,7 @@ var valves = {};
 // Valve
 // *****
 
-function Valve(id, stage, bitmapEng, bitmapDeeng, x, y, rotation=null, scaleX=null, scaleY=null) {
+function Valve(id, stage, bitmapEng, bitmapDeeng, x, y, rotation, scaleX, scaleY) {
     this.initialise(id, stage, bitmapEng, bitmapDeeng, x, y, rotation, scaleX, scaleY);
 }
 
@@ -22,19 +22,19 @@ Valve.prototype.initialise = function(id, stage, bitmapEng, bitmapDeeng, x, y, r
     this._bitmapDeeng = bitmapDeeng.clone();
 
     this._bitmapEng.regX = this._bitmapEng.image.width/2;
-    this._bitmapEng.regY = this._bitmapEng.image.width/2;
+    this._bitmapEng.regY = this._bitmapEng.image.height/2;
     this._bitmapDeeng.regX = this._bitmapDeeng.image.width/2;
-    this._bitmapDeeng.regY = this._bitmapDeeng.image.width/2;
+    this._bitmapDeeng.regY = this._bitmapDeeng.image.height/2;
 
-    if (rotation != null) {
+    if (rotation !== undefined) {
         this._bitmapEng.rotation = rotation;
         this._bitmapDeeng.rotation = rotation;
     }
-    if (scaleX != null) {
+    if (scaleX !== undefined) {
         this._bitmapEng.scaleX = scaleX;
         this._bitmapDeeng.scaleX = scaleX;
     }
-    if (scaleY != null) {
+    if (scaleY !== undefined) {
         this._bitmapEng.scaleY = scaleY;
         this._bitmapDeeng.scaleY = scaleY;
     }
@@ -45,9 +45,12 @@ Valve.prototype.initialise = function(id, stage, bitmapEng, bitmapDeeng, x, y, r
     this._stage.addChild(this._container);
 
     // FIXME : need to centre the two images inside the container and need to work with container's height, not an embedded image.
-    this._container.x = x + (this._bitmapEng.image.width * Math.abs(this._bitmapEng.scaleX))/2;
-    this._container.y = 1217-y - (this._bitmapEng.image.height * Math.abs(this._bitmapEng.scaleY))/2
-; 
+    this._container.x = x + 
+        (this._bitmapEng.image.width * Math.abs(this._bitmapEng.scaleX))/2;
+    this._container.y = 1217-y - 
+        (this._bitmapEng.image.height * Math.abs(this._bitmapEng.scaleY))/2;
+
+
 
     this._timeTillChangeComplete = 0;
     this._changeDuration = 2; // seconds
@@ -67,27 +70,38 @@ Valve.prototype.initialise = function(id, stage, bitmapEng, bitmapDeeng, x, y, r
     //this._container.addEventListener("click", function(event) { console.log("valve was clicked"); });
     var self = this;
     this._container.addEventListener("click", function() { Valve.prototype.onClick.call(self); } );
+    //this._container.addEventListener("dblclick", function() { Valve.prototype.onDblClick.call(self); } );
 }
+
+
+Valve.prototype.auto = function() {
+    this._auto = true;
+}
+
+Valve.prototype.manual = function() {
+    this._auto = false;
+}
+
 
 Valve.prototype.eng = function() {
     this._state = "eng";
     this._bitmapEng.alpha = 1;
     this._bitmapDeeng.alpha = 0.1;
-    this._stage.update();
+    //this._stage.update();
 }
 
 Valve.prototype.deeng = function() {
     this._state = "deeng";
     this._bitmapEng.alpha = 0.1;
     this._bitmapDeeng.alpha = 1;
-    this._stage.update();
+    //this._stage.update();
 }
 
 Valve.prototype.unknown = function() {
     this._state = "unknown";
     this._bitmapEng.alpha = 0.3;
     this._bitmapDeeng.alpha = 0.3;
-    this._stage.update();
+    //this._stage.update();
 }
 
 Valve.prototype.fault = function() {
@@ -119,11 +133,94 @@ Valve.prototype.event = function(data) {
     } else {
         this.deeng();
     }
+
+    if (data[this._id].man) {
+        this.manual();
+    } else {
+        this.auto();
+    }
 }
 
 Valve.prototype.onClick = function() {
-    console.log("Valve "+this._id+" was clicked");
-}
+    var self = this;
+    console.log("Valve "+self._id+" was clicked");
+    if (self._auto) {
+        // Move to manual mode
+        console.log("Moving valve "+self._id+" to manual mode");
+        $.ajax( { url: "/write?"+self._id+"=manual",
+                  dataType: "json",
+                  type: "GET"
+                })
+            .done( function(data) {
+                console.log("Finished sending manual command to valve "+self._id+" received:",data);
+            })
+            .fail( function() {
+                console.log("Failed to send manual command to valve "+self._id);
+            });        
+    }
+    else if (self._state == "eng") {
+        // Send a deeng command
+        console.log("Deenergising valve "+self._id);
+        $.ajax( { url: "/write?"+self._id+"=manualOff",
+                  dataType: "json",
+                  type: "GET"
+                })
+            .done( function(data) {
+                console.log("Finished sending deeng command to valve "+self._id+" received:",data);
+            })
+            .fail( function() {
+                console.log("Failed to send deeng command to valve "+self._id);
+            });
+    }
+    else if (self._state == "deeng") {
+        // Send an eng command
+        console.log("Energising valve "+self._id);
+        $.ajax( { url: "/write?"+self._id+"=manualOn",
+                  dataType: "json",
+                  type: "GET"
+                })
+            .done( function(data) {
+                console.log("Finished sending eng command to valve "+self._id+" received:", data);
+            })
+            .fail( function() {
+                console.log("Failed to send eng command to valve "+self._id);
+            });
+    }
+};
+
+/*
+Valve.prototype.onDblClick = function() {
+    var self = this;
+    console.log("Valve "+self._id+" was double-clicked");
+    if (self._auto) {
+        // Move to manual mode
+        console.log("Moving valve "+self._id+" to manual mode");
+        $.ajax( { url: "/write?"+self._id+"=manual",
+                  dataType: "json",
+                  type: "GET"
+                })
+            .done( function(data) {
+                console.log("Finished sending manual command to valve "+self._id+" received:",data);
+            })
+            .fail( function() {
+                console.log("Failed to send manual command to valve "+self._id);
+            });        
+    } else {
+        // Move to auto mode
+        console.log("Moving valve "+self._id+" to auto mode");
+        $.ajax( { url: "/write?"+self._id+"=auto",
+                  dataType: "json",
+                  type: "GET"
+                })
+            .done( function(data) {
+                console.log("Finished sending auto command to valve "+self._id+" received:",data);
+            })
+            .fail( function() {
+                console.log("Failed to send auto command to valve "+self._id);
+            });        
+    }
+};
+*/
 
 
 // EventSource
@@ -157,6 +254,7 @@ function onEventSourceMessage(event) {
         valves[v].event( data );
     }
 
+    stage.update();
 }
 
 
@@ -179,10 +277,6 @@ function init() {
     ivEng = new createjs.Bitmap("images/ivEng.png");
     ivDeeng = new createjs.Bitmap("images/ivDeeng.png");
 
-    dvEng = new createjs.Bitmap("images/dvEng.png");
-    dvDeeng = new createjs.Bitmap("images/dvDeeng.png");
-    
-
     valves["iv01"] =  new Valve("iv01", stage, ivEng, ivDeeng, 520,  463, rotation=90);
     valves["iv02"] = new Valve("iv02", stage, ivEng, ivDeeng, 855,  543, rotation=90);
     valves["iv03"] = new Valve("iv03", stage, ivEng, ivDeeng, 975,  543, rotation=90);
@@ -196,13 +290,28 @@ function init() {
     valves["iv15"] = new Valve("iv15", stage, ivEng, ivDeeng, 215,  458);
     valves["iv16"] = new Valve("iv16", stage, ivEng, ivDeeng, 329,   33);
 
-    valves["dv01"] = new Valve("dv01", stage, dvEng, dvDeeng, 840,  603, rotation=null, scaleX=-1);
-    valves["dv02"] = new Valve("dv02", stage, dvEng, dvDeeng, 960,  593, rotation=-90);
+
+    dvEng = new createjs.Bitmap("images/dvEng.png");
+    dvDeeng = new createjs.Bitmap("images/dvDeeng.png");
+    
+    valves["dv01"] = new Valve("dv01", stage, dvEng, dvDeeng, 840,  603, 
+                               rotation=null, scaleX=-1, scaleY=-1);
+    valves["dv02"] = new Valve("dv02", stage, dvEng, dvDeeng, 960,  593, 
+                               rotation=-90);
     valves["dv03"] = new Valve("dv03", stage, dvEng, dvDeeng, 920,  833);
     valves["dv04"] = new Valve("dv04", stage, dvEng, dvDeeng, 450,  983);
-    valves["dv05"] = new Valve("dv05", stage, dvEng, dvDeeng, 445,  323, rotation=-90);
-    valves["dv06"] = new Valve("dv06", stage, dvEng, dvDeeng, 350,  853, rotation=-90, scaleX=0.67, scaleY=0.67);
-    valves["dv07"] = new Valve("dv07", stage, dvEng, dvDeeng, 445,  323, rotation=-90);
+    valves["dv05"] = new Valve("dv05", stage, dvEng, dvDeeng, 445,  323, 
+                               rotation=-90);
+    valves["dv06"] = new Valve("dv06", stage, dvEng, dvDeeng, 350,  853, 
+                               rotation=-90, scaleX=0.67, scaleY=-0.67);
+    //valves["dv07"] = new Valve("dv07", stage, dvEng, dvDeeng, 445,  323, rotation=-90);
+
+    bfEng = new createjs.Bitmap("images/bfEng.png");
+    bfDeeng = new createjs.Bitmap("images/bfDeeng.png");
+
+    valves["bf01"] = new Valve("bf01", stage, bfEng, bfDeeng, 1080,  973);
+
+
 /*
     createjs.Ticker.addEventListener("tick", function(event) {
         if (valve.rotationTarget - valve.rotation > delta) {

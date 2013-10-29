@@ -40,7 +40,7 @@ class PLCTime(PLCObject):
         self.addressSecond = 8238
         
 
-    def get(self):
+    def getTime(self):
         deferreds = []
 
         deferreds.append( self._factory.instance.getRegister(self.addressYear) )
@@ -60,6 +60,38 @@ class PLCTime(PLCObject):
         result.addCallback( formatResult )
 
         return result
+
+
+    def get(self):
+        time1 = self.getTime()
+        def onTime1(data):
+            # Get the system time for when the PLC time was received
+            received1 = datetime.datetime.now()
+            plcTime1 = data
+            
+            # Get the PLC's time again
+            time2 = self.getTime()
+            def onTime2(data):
+                received2 = datetime.datetime.now()
+                plcTime2 = data
+                
+                # Check that the two times were separated by less than one minute of system time
+                if (received2 - received1).total_seconds() >= 60:
+                    return None # Times are so far apart as to be unusable
+            
+                # If plcTime2 is equal to or after plcTime1, then return plcTime2
+                if plcTime2 >= plcTime1:
+                    return plcTime2
+                else:
+                    # plcTime1 is after plcTime2, so we have an error in plcTime2; 
+                    # update plcTime1 and return that
+                    return plcTime1 + (received2 - received1)
+
+            time2.addCallback(onTime2)
+            return time2
+
+        time1.addCallback(onTime1)
+        return time1
 
     def set(self, value):
         # Ignore value and set to current system time
@@ -194,6 +226,12 @@ class PLCEnergisable(PLCObject):
         d = defer.gatherResults( [status1.get(), status2.get()] )
         d.addCallback( getResult )
         return d
+
+    def set(self, value):
+        valueAsInt = self.labelsCommand.index(value)
+        command = PLCInt(self._factory, self.addressCommand, 'FIXME')
+        d = command.set(valueAsInt)
+        return d 
         
 
 class PLCPIDController(PLCObject):
@@ -227,9 +265,9 @@ class PLCPIDController(PLCObject):
         self.status = PLCBitSet(self._factory, self.addressStatus, self.labelsStatus)
 
         # The number of decimal places may need to be redefined (by the user?)
-        self.pv = PLCFixed(self._factory, self.addressPV, 2, "pv") 
+        self.pv = PLCFixed(self._factory, self.addressPV, 3, "pv") 
         self.cv = PLCFixed(self._factory, self.addressCV, 2, "cv") 
-        self.sp = PLCFixed(self._factory, self.addressSP, 2, "sp") 
+        self.sp = PLCFixed(self._factory, self.addressSP, 3, "sp") 
 
         self.p = PLCFixed(self._factory, self.addressP, 2, "p")
         self.i = PLCFixed(self._factory, self.addressI, 2, "i")
