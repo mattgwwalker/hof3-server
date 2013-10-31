@@ -1,5 +1,5 @@
 from ASCIIClientProtocol import ASCIIClientFactory
-from PLCHOF3 import *
+from HOF3 import *
 from PLCObjects import *
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
