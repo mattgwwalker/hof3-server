@@ -32,6 +32,7 @@ class ASCIIClientProtocol(LineReceiver):
 
     def connectionLost(self, reason):
         print "The connection to the PLC has been lost."
+        self._busy = False
 
     def processCommand(self):
         if not self._busy:

@@ -9,6 +9,7 @@ def PLCUserMemory(index):
 
 
 def PLCJoin( deferreds ):
+    # Assumes that the values to be joined are dicts.
     d = defer.gatherResults( deferreds )
     def onResult(data):
         result = collections.OrderedDict()
@@ -19,8 +20,10 @@ def PLCJoin( deferreds ):
     return d
 
 class PLCObject:
-    def __init__(self, factory):
+    def __init__(self, factory, label):
         self._factory = factory
+        self._objects = collections.OrderedDict()
+        self._label = label
         
     def get(self):
         raise NotImplementedError("get() has not been defined for this PLCObject")
@@ -28,10 +31,52 @@ class PLCObject:
     def set(self):
         raise NotImplementedError("set() has not been defined for this PLCObject")
 
+    def addObject(self, obj):
+        self._objects[obj._label] = obj
+
+
+
+    def _child(self, labelsAsList):
+        child = self._objects[labelsAsList[0]]
+        if len(labelsAsList) == 1:
+            print "In ",self._label," getting ",labelsAsList[0]
+            return child
+        else:
+            return child._child(labelsAsList[1:])
+
+
+    def child(self, label):
+        print "label:",label
+        assert label is not None
+        parts = label.split('.')
+        return self._child(parts)
+
+class PLCGroup(PLCObject):
+    def __init__(self, factory, label, objects):
+        PLCObject.__init__(self, factory, label)
+        self._objects = objects
+
+    def get(self):
+        deferreds = []
+        for obj in self._objects:
+            d = obj.get()
+            deferreds.append(d)
+        return PLCJoin(deferreds)
+
+    def set(self, values):
+        assert len(values) == len(self._objects)
+        deferreds = []
+        for i in range(len(self._objects)):
+            obj = self._objects[i]
+            value = values[i]
+            d = obj.set(value)
+            deferreds.append(d)
+        return PLCJoin(deferreds)
+
 
 class PLCTime(PLCObject):
-    def __init__(self, factory):
-        PLCObject.__init__(self, factory)
+    def __init__(self, factory, label="time"):
+        PLCObject.__init__(self, factory, label)
         self.addressYear = 8244
         self.addressMonth = 8243
         self.addressDay = 8242
@@ -55,7 +100,7 @@ class PLCTime(PLCObject):
             data[0] = "20"+data[0]            # convert two-digit to four-digit year
             data = [int(i) for i in data]     # convert to ints
             return datetime.datetime( *data ) # convert to datetime
-             
+
         result = defer.gatherResults( deferreds )
         result.addCallback( formatResult )
 
@@ -77,15 +122,15 @@ class PLCTime(PLCObject):
                 
                 # Check that the two times were separated by less than one minute of system time
                 if (received2 - received1).total_seconds() >= 60:
-                    return None # Times are so far apart as to be unusable
+                    return { self._label : None } # Times are so far apart as to be unusable
             
                 # If plcTime2 is equal to or after plcTime1, then return plcTime2
                 if plcTime2 >= plcTime1:
-                    return plcTime2
+                    return { self._label : plcTime2.isoformat() }
                 else:
                     # plcTime1 is after plcTime2, so we have an error in plcTime2; 
                     # update plcTime1 and return that
-                    return plcTime1 + (received2 - received1)
+                    return { self._label : (plcTime1 + (received2 - received1)).isoformat() }
 
             time2.addCallback(onTime2)
             return time2
@@ -140,21 +185,23 @@ class PLCBitSet(PLCObject):
         d.addCallback( getResult )
         return d
 
+    #def child(self, label):
+        
 
 
 class PLCInt(PLCObject):
-    def __init__(self, factory, address, label):
+    def __init__(self, factory, address):
         PLCObject.__init__(self, factory)
         self.address = address
-        self.label = label
 
     def get(self):
         d = self._factory.getRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
-            result = dict()
-            result[self.label] = int(data)
-            return result
+            return int(data)
+            #result = dict()
+            #result[self.label] = int(data)
+            #return result
         d.addCallback( getResult )
         return d
 
@@ -179,9 +226,10 @@ class PLCFixed(PLCObject):
         d = self._factory.getRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
-            result = dict()
-            result[self.label] = int(data)/float(10**self.decimalPlace)
-            return result
+            return int(data)/float(10**self.decimalPlace)
+            #result = dict()
+            #result[self.label] = int(data)/float(10**self.decimalPlace)
+            #return result
         d.addCallback( getResult )
         return d
 
@@ -227,7 +275,7 @@ class PLCEnergisable(PLCObject):
 
     def set(self, value):
         valueAsInt = self.labelsCommand.index(value)
-        command = PLCInt(self._factory, self.addressCommand, 'FIXME')
+        command = PLCInt(self._factory, self.addressCommand) # FIXME: This should be an independent sub-object
         d = command.set(valueAsInt)
         return d 
         
@@ -262,16 +310,24 @@ class PLCPIDController(PLCObject):
 
         self.status = PLCBitSet(self._factory, self.addressStatus, self.labelsStatus)
 
+
+        # Add the controller's 'vars'
+        pv = PLCFixed(self._factory, self.addressPV, 3, "pv") 
+        cv = PLCFixed(self._factory, self.addressCV, 2, "cv") 
+        sp = PLCFixed(self._factory, self.addressSP, 3, "sp") 
+        variables = PLCGroup( self._factory, [pv,cv, sp] )
+        self._objects["vars"] = variables
+
+
+        # Add the controller's 'config' variables
         # The number of decimal places may need to be redefined (by the user?)
-        self.pv = PLCFixed(self._factory, self.addressPV, 3, "pv") 
-        self.cv = PLCFixed(self._factory, self.addressCV, 2, "cv") 
-        self.sp = PLCFixed(self._factory, self.addressSP, 3, "sp") 
+        p = PLCFixed(self._factory, self.addressP, 2, "p")
+        i = PLCFixed(self._factory, self.addressI, 2, "i")
+        d = PLCFixed(self._factory, self.addressD, 2, "d")
+        config = PLCGroup( self._factory, [pv,cv, sp] )
+        self._objects["config"] = config
 
-        self.p = PLCFixed(self._factory, self.addressP, 2, "p")
-        self.i = PLCFixed(self._factory, self.addressI, 2, "i")
-        self.d = PLCFixed(self._factory, self.addressD, 2, "d")
-
-        self.command = PLCInt(self._factory, self.addressCommand, "command")
+        self.command = PLCInt(self._factory, self.addressCommand)
 
     def get(self):
         deferreds = []
@@ -282,5 +338,5 @@ class PLCPIDController(PLCObject):
         deferreds.append( self.p.get() )
         deferreds.append( self.i.get() )
         deferreds.append( self.d.get() )
+        
         return PLCJoin( deferreds )
-            
