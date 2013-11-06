@@ -65,6 +65,7 @@ class EventSource(Resource):
             if "time" in request.args:
                 response["time"] = datetime.datetime.now().isoformat()
             
+            #print "Writing event for response:",response
             request.write("\nevent:\n")
             request.write("data: "+json.dumps(response)+"\n")
 

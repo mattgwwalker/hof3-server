@@ -166,6 +166,18 @@ class PLCInt(PLCObject):
         d.addCallback( getResult )
         return d
         
+
+class PLCEnum(PLCInt):
+    def __init__(self, factory, address, states, label):
+        PLCInt.__init__(self, factory, address, label)
+        self._states = states
+
+    def get(self):
+        # returns both the value and its descriptive state
+        d = PLCInt.get(self)
+        def onResult(data):
+            # data is a dict
+            data["state"] = self._states[data
     
 
 class PLCFixed(PLCObject):

@@ -38,12 +38,17 @@ class HOF3ClientFactory(ASCIIClientFactory):
         self.objects["pp02"] = PLCEnergisable( self, PLCUserMemory(610) )
         self.objects["pp03"] = PLCEnergisable( self, PLCUserMemory(620) )
 
-        self.objects["pc01"] = PLCPIDController( self, PLCUserMemory(650) )
-        self.objects["pc03"] = PLCPIDController( self, PLCUserMemory(670) )
-        self.objects["pc05"] = PLCPIDController( self, PLCUserMemory(690) )
+        self.objects["pc01"] = PLCPIDController( self, PLCUserMemory(670) )
+        self.objects["pc03"] = PLCPIDController( self, PLCUserMemory(710) )
+        self.objects["pc05"] = PLCPIDController( self, PLCUserMemory(750) )
         self.objects["dpc01"]= PLCPIDController( self, PLCUserMemory(630) )
-        self.objects["rc01"] = PLCPIDController( self, PLCUserMemory(710) )
+        self.objects["rc01"] = PLCPIDController( self, PLCUserMemory(790) )
 
-
+        self.objects["FD100cmd"] = PLCEnum(self, PLCUserMemory(900) ) 
+        # This is more of an enum type... 0: None, 
+        # 2: Stop with pushbutton acknowledgement, 
+        # 3: Stop immediately
+        # 4: Production with retentate bleed and permeate out, with bushbutton acklnowledgement
+        # 5: as above, immediately
 
         

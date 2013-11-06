@@ -31,7 +31,7 @@ var controllers = {
                              id : "cv" } 
                     },
     "pc05" :        { id : "pc05",
-                      label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3) NOT WORKING",
+                      label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3)",
                       pv : { label : "Trans-membrane pressure ((P1+P2)/2 - P3)",
                              units : ["barg", " barg"],
                              rounding : 1,
@@ -45,8 +45,8 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "dpc01" :       { id : "dpc05",
-                      label : "DPC05: Along-membrane controller (master controller for pump speed) NOT WORKING",
+    "dpc01" :       { id : "dpc01",
+                      label : "DPC01: Along-membrane controller (master controller for pump speed) IN TESTING",
                       pv : { label : "???",
                              units : ["barg", " barg"],
                              rounding : 1,
@@ -104,12 +104,23 @@ function openEventSource(controller) {
         queryParts[i] = queryIDs[i]+"="+1;
     }
     queryParts.push("time=1")
+    queryParts.push("freq=0.5")
 
     queryString = queryParts.join("&");
 
     var address = "/events?"+queryString;
     console.log("Creating EventSource from "+address);
     return new EventSource(address);
+}
+
+function onOpenEventSource() {
+    console.log("EventSource is open.");
+    $("#ConfigurePID_ContainerGraph").show();
+}
+
+function onMessageEventSource(event) {
+    getPoints(event, controller);
+    plotGraph();
 }
 
 
@@ -119,6 +130,11 @@ function onChangeDuration() {
 
 
 function onChangeController() {
+    // Hide the controller details until they've arrived from the server
+    $("#ConfigurePID_ContainerGraph").hide();
+    $("#ConfigurePID_ContainerControllerDetails").hide();
+
+    // Get the selected controller
     var value = $("#ConfigurePID_Controller").val();
     controller = controllers[value];
 
@@ -132,15 +148,21 @@ function onChangeController() {
 
     // Open new eventsource
     eventSource = openEventSource(controller);
+    eventSource.onmessage = onMessageEventSource;
+    eventSource.onopen = onOpenEventSource;
 
-    eventSource.onmessage = function(event) {
-        getPoints(event, controller);
-        plotGraph();
-    };
+    // Get controller details
+    $.ajax( {
+        url: "READ CONTROLLER DETAILS HERE",
+            type: "GET"
+        })
+        .done( function(data) {
+            // Display details
+        })
+        .fail( function(data) {
+            showError("Failed to get controller details.  Are you still connected to HOF3?");
+        });
 
-    eventSource.onopen = function() {
-        console.log("EventSource is open.");
-    };
 }
 
 
@@ -229,18 +251,16 @@ function getPoints(event, controller) {
     var data = JSON.parse(event.data);
 
     var t = Date.parse(data.time);  // The factor of 1000 is to convert from unix time to javascript time
-    console.log("data.time:",data.time)
-    console.log("t:",t)
 
     // FIXME: the three multipliers below are for testing
     var pv = parseFloat( data[controller.id][controller.pv.id] );
     var sp = parseFloat( data[controller.id][controller.sp.id] );
     var cv = parseFloat( data[controller.id][controller.cv.id] );
 
-    console.log("data:",data)
+    //console.log("data:",data)
     //console.log("controller.id:", controller.id);
-    console.log("data[controller.id]:", data[controller.id]);
-    console.log("pv:",pv)
+    //console.log("data[controller.id]:", data[controller.id]);
+    //console.log("pv:",pv)
 
     updateText(pv, sp, cv);
     updatePoints(t, pv, sp, cv);
@@ -291,6 +311,11 @@ function plotGraph() {
            }
           );
 }
+
+function getDetail() {
+// Get detail about the PID controller (P, I, and D values and ramping values)
+}
+
 
 
 // Interface: Automatic button
@@ -364,6 +389,7 @@ $(document).on( "pageshow", "#ConfigurePID_Page", function(event) {
     $("#Graph").css("height", windowHeight - position);
 
     // Hide controller details until they're available
+    $("#ConfigurePID_ContainerGraph").hide();
     $("#ConfigurePID_ContainerControllerDetails").hide();
 });
 
