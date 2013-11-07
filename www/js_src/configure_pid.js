@@ -31,7 +31,7 @@ var controllers = {
                              id : "cv" } 
                     },
     "pc05" :        { id : "pc05",
-                      label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3) NOT WORKING",
+                      label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3)",
                       pv : { label : "Trans-membrane pressure ((P1+P2)/2 - P3)",
                              units : ["barg", " barg"],
                              rounding : 1,
@@ -45,8 +45,8 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "dpc01" :       { id : "dpc05",
-                      label : "DPC05: Along-membrane controller (master controller for pump speed) NOT WORKING",
+    "dpc01" :       { id : "dpc01",
+                      label : "DPC01: Along-membrane controller (master controller for pump speed) IN TESTING",
                       pv : { label : "???",
                              units : ["barg", " barg"],
                              rounding : 1,
@@ -153,18 +153,14 @@ function onChangeController() {
 
     // Get controller details
     $.ajax( {
-        url: "partial/membrane_form.php",
+        url: "READ CONTROLLER DETAILS HERE",
             type: "GET"
         })
         .done( function(data) {
-            // Get select control and remove previously displayed data
-            var container = $("#AddNewMembrane_ContainerForm");
-            container.empty();
-            container.html(data).trigger("create");
-            container.find(".Retired").hide();
+            // Display details
         })
         .fail( function(data) {
-            showError("Failed to obtain the membrane form.  Are you still connected to HOF3?");
+            showError("Failed to get controller details.  Are you still connected to HOF3?");
         });
 
 }
