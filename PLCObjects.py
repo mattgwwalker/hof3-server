@@ -43,27 +43,19 @@ class PLCObject:
         self._children = collections.OrderedDict()
         
     def get(self):
-        print "In default get()... Getting all children..."
         return self.getAllChildren()
 
     def set(self):
         raise NotImplementedError("set() has not been defined for this PLCObject")
 
     def addChild(self, label, obj):
-        #print "adding child, label:",label,"obj:",obj
         self._children[label] = obj
-        #print "child added, self._children:",self._children
 
     def _getChild(self, labelsAsList):
-        print "Getting child with labelsAsList:",labelsAsList
         child = self._children[labelsAsList[0]]
         if len(labelsAsList) == 1:
             d = child.get()
-            print "Getting ",labelsAsList[0]
-            print "in _getChild(), d:",d
-            print "child:",child
         else:
-            print "Going down..."
             d = child._getChild(labelsAsList[1:])
         def onResult(data):
             return { labelsAsList[0] : data }
@@ -72,7 +64,6 @@ class PLCObject:
 
     def getChild(self, label):
         """Returns child's result in dictionary with the child's name as the key"""
-       #print "label:",label
         assert label is not None
         parts = label.split('.')
         return self._getChild(parts)
@@ -81,28 +72,21 @@ class PLCObject:
         """Goes through specified children and returns their results in a dictionary"""
         deferreds = []
         for label in children:
-            print "\nIn for loop with label:",label
             d = self.getChild(label)
             deferreds.append(d)
-        print "gatherResult's deferreds:",deferreds
         d = defer.gatherResults( deferreds )
         def onResults(data):
-            print "In onResults()"
             result = collections.OrderedDict()
             index = 0
             for label in children:
-                print "label:",label
-                print "data[index]:",data[index]
                 result.update(data[index])
                 index += 1
             return result
         d.addCallback(onResults)
-        print "returning d:",d
         return d
         
     def getAllChildren(self):
         """Goes through all the children and returns their results in a dictionary"""
-        print "self._children.keys():",self._children.keys()
         return self.getChildren( self._children.keys() )
 
     def set(self, values):

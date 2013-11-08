@@ -52,12 +52,15 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("dpc01",PLCPIDController( self, PLCUserMemory(630) ))
         self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790) ))
 
-        # CPU Usage
+        # General
         self.addChild("cpu_usage", PLCInt(self, 8434))
+        self.addChild("macro_size", PLCInt(self, 4433))
+        self.addChild("time", PLCTime(self))
 
 
-        #self.addChild("FD100cmd", PLCEnum(self, PLCUserMemory(900) ) 
-        # This is more of an enum type... 0: None, 
+        self.addChild("command", PLCInt(self, PLCUserMemory(900)))
+        # This is more of an enum type... 
+        # 0: None, 
         # 2: Stop with pushbutton acknowledgement, 
         # 3: Stop immediately
         # 4: Production with retentate bleed and permeate out, with bushbutton acklnowledgement
