@@ -1,21 +1,21 @@
 
 var controllers = {
-    "pc01" :        { id : "pc01",
+    "pc01" :        { id : "hof3.pc01",
                       label : "PC01: Pump pressure slave (P1)",
                       pv : { label : "Before membrane pressure (P1)",
                              units : ["barg", " barg"],
                              rounding : 2,
-                             id : "pv" },
+                             id : "vars.pv" },
                       sp : { label : "Setpoint",
                              units : ["barg", " barg"],
                              rounding : 2,
-                             id : "sp" },
+                             id : "vars.sp" },
                       cv : { label : "Pump 1 Speed",
                              units : ["%", "%"],
                              rounding : 1,
-                             id : "cv" } 
+                             id : "vars.cv" } 
                     },
-    "pc03" :        { id : "pc03",
+    "pc03" :        { id : "hof3.pc03",
                       label : "PC03: Backflush pressure (P3) NOT WORKING",
                       pv : { label : "Backflush pressure (P3)",
                              units : ["barg", " barg"],
@@ -30,7 +30,7 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "pc05" :        { id : "pc05",
+    "pc05" :        { id : "hof3.pc05",
                       label : "PC05: Trans-membrane pressure ((P1+P2)/2 - P3)",
                       pv : { label : "Trans-membrane pressure ((P1+P2)/2 - P3)",
                              units : ["barg", " barg"],
@@ -45,7 +45,7 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "dpc01" :       { id : "dpc01",
+    "dpc01" :       { id : "hof3.dpc01",
                       label : "DPC01: Along-membrane controller (master controller for pump speed) IN TESTING",
                       pv : { label : "???",
                              units : ["barg", " barg"],
@@ -60,7 +60,7 @@ var controllers = {
                              rounding : 1,
                              id : "cv" } 
                     },
-    "rc01" :       { id : "rc01",
+    "rc01" :       { id : "hof3.rc01",
                       label : "RC01: Retentate bleed controller NOT WORKING",
                       pv : { label : "???",
                              units : ["barg", " barg"],
@@ -100,10 +100,8 @@ function openEventSource(controller) {
     var queryIDs = [controller.id];
     var queryParts = [];
     
-    for (i=0; i<queryIDs.length; i++) {
-        queryParts[i] = queryIDs[i]+"="+1;
-    }
-    queryParts.push("time=1")
+    queryIDs.push("time");
+    queryParts.push("obj="+queryIDs.join(","));
     queryParts.push("freq=0.5")
 
     queryString = queryParts.join("&");
@@ -245,6 +243,13 @@ function updatePoints(t, pv, sp, cv) {
 
 
 
+function getChild(data, path) {
+    parts = path.split(".");
+    for (i=0; i<parts.length; i++) {
+        data = data[parts[i]];
+    }
+    return data
+}
 
 
 function getPoints(event, controller) {
@@ -252,10 +257,13 @@ function getPoints(event, controller) {
 
     var t = Date.parse(data.time);  // The factor of 1000 is to convert from unix time to javascript time
 
-    // FIXME: the three multipliers below are for testing
-    var pv = parseFloat( data[controller.id][controller.pv.id] );
-    var sp = parseFloat( data[controller.id][controller.sp.id] );
-    var cv = parseFloat( data[controller.id][controller.cv.id] );
+    data = getChild(data, controller.id);
+    data_pv = getChild(data, controller.pv.id);
+    var pv = parseFloat( data_pv );
+    data_sp = getChild(data, controller.sp.id);
+    var sp = parseFloat( data_sp );
+    data_cv = getChild(data, controller.cv.id);
+    var cv = parseFloat( data_cv );
 
     //console.log("data:",data)
     //console.log("controller.id:", controller.id);

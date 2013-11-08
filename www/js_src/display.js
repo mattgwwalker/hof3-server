@@ -128,13 +128,18 @@ Valve.prototype.tick = function() {
 }
 
 Valve.prototype.event = function(data) {
-    if (data[this._id].out) {
+    parts = this._id.split(".");
+    for (i=0; i<parts.length; i++) {
+        data = data[parts[i]];
+    }
+
+    if (data.status.out) {
         this.eng();
     } else {
         this.deeng();
     }
 
-    if (data[this._id].man) {
+    if (data.status.man) {
         this.manual();
     } else {
         this.auto();
@@ -233,13 +238,7 @@ function openEventSource() {
         queryIDs.push(valves[v]._id)
     }
 
-    var queryParts = [];
-    
-    for (i=0; i<queryIDs.length; i++) {
-        queryParts[i] = queryIDs[i]+"="+1;
-    }
-
-    queryString = queryParts.join("&");
+    queryString = "obj="+queryIDs.join(",");
 
     var address = "/events?"+queryString;
     console.log("Creating EventSource from "+address);
@@ -277,39 +276,39 @@ function init() {
     ivEng = new createjs.Bitmap("images/ivEng.png");
     ivDeeng = new createjs.Bitmap("images/ivDeeng.png");
 
-    valves["iv01"] =  new Valve("iv01", stage, ivEng, ivDeeng, 520,  463, rotation=90);
-    valves["iv02"] = new Valve("iv02", stage, ivEng, ivDeeng, 855,  543, rotation=90);
-    valves["iv03"] = new Valve("iv03", stage, ivEng, ivDeeng, 975,  543, rotation=90);
-    valves["iv04"] = new Valve("iv04", stage, ivEng, ivDeeng, 1075, 708, rotation=0);
-    valves["iv05"] = new Valve("iv05", stage, ivEng, ivDeeng, 790,  618, rotation=0);
-    valves["iv06"] = new Valve("iv06", stage, ivEng, ivDeeng, 755,  708, rotation=0);
-    valves["iv07"] = new Valve("iv07", stage, ivEng, ivDeeng, 755,  948, rotation=90);
-    valves["iv08"] = new Valve("iv08", stage, ivEng, ivDeeng, 330, 1068);
-    valves["iv09"] = new Valve("iv09", stage, ivEng, ivDeeng, 325,  923, rotation=90);
-    valves["iv10"] = new Valve("iv10", stage, ivEng, ivDeeng, 195,  888);
-    valves["iv15"] = new Valve("iv15", stage, ivEng, ivDeeng, 215,  458);
-    valves["iv16"] = new Valve("iv16", stage, ivEng, ivDeeng, 329,   33);
+    valves["iv01"] =  new Valve("hof3.iv01", stage, ivEng, ivDeeng, 520,  463, rotation=90);
+    valves["iv02"] = new Valve("hof3.iv02", stage, ivEng, ivDeeng, 855,  543, rotation=90);
+    valves["iv03"] = new Valve("hof3.iv03", stage, ivEng, ivDeeng, 975,  543, rotation=90);
+    valves["iv04"] = new Valve("hof3.iv04", stage, ivEng, ivDeeng, 1075, 708, rotation=0);
+    valves["iv05"] = new Valve("hof3.iv05", stage, ivEng, ivDeeng, 790,  618, rotation=0);
+    valves["iv06"] = new Valve("hof3.iv06", stage, ivEng, ivDeeng, 755,  708, rotation=0);
+    valves["iv07"] = new Valve("hof3.iv07", stage, ivEng, ivDeeng, 755,  948, rotation=90);
+    valves["iv08"] = new Valve("hof3.iv08", stage, ivEng, ivDeeng, 330, 1068);
+    valves["iv09"] = new Valve("hof3.iv09", stage, ivEng, ivDeeng, 325,  923, rotation=90);
+    valves["iv10"] = new Valve("hof3.iv10", stage, ivEng, ivDeeng, 195,  888);
+    valves["iv15"] = new Valve("hof3.iv15", stage, ivEng, ivDeeng, 215,  458);
+    valves["iv16"] = new Valve("hof3.iv16", stage, ivEng, ivDeeng, 329,   33);
 
 
     dvEng = new createjs.Bitmap("images/dvEng.png");
     dvDeeng = new createjs.Bitmap("images/dvDeeng.png");
     
-    valves["dv01"] = new Valve("dv01", stage, dvEng, dvDeeng, 840,  603, 
+    valves["dv01"] = new Valve("hof3.dv01", stage, dvEng, dvDeeng, 840,  603, 
                                rotation=null, scaleX=-1, scaleY=-1);
-    valves["dv02"] = new Valve("dv02", stage, dvEng, dvDeeng, 960,  593, 
+    valves["dv02"] = new Valve("hof3.dv02", stage, dvEng, dvDeeng, 960,  593, 
                                rotation=-90);
-    valves["dv03"] = new Valve("dv03", stage, dvEng, dvDeeng, 920,  833);
-    valves["dv04"] = new Valve("dv04", stage, dvEng, dvDeeng, 450,  983);
-    valves["dv05"] = new Valve("dv05", stage, dvEng, dvDeeng, 445,  323, 
+    valves["dv03"] = new Valve("hof3.dv03", stage, dvEng, dvDeeng, 920,  833);
+    valves["dv04"] = new Valve("hof3.dv04", stage, dvEng, dvDeeng, 450,  983);
+    valves["dv05"] = new Valve("hof3.dv05", stage, dvEng, dvDeeng, 445,  323, 
                                rotation=-90);
-    valves["dv06"] = new Valve("dv06", stage, dvEng, dvDeeng, 350,  853, 
+    valves["dv06"] = new Valve("hof3.dv06", stage, dvEng, dvDeeng, 350,  853, 
                                rotation=-90, scaleX=0.67, scaleY=-0.67);
     //valves["dv07"] = new Valve("dv07", stage, dvEng, dvDeeng, 445,  323, rotation=-90);
 
     bfEng = new createjs.Bitmap("images/bfEng.png");
     bfDeeng = new createjs.Bitmap("images/bfDeeng.png");
 
-    valves["bf01"] = new Valve("bf01", stage, bfEng, bfDeeng, 1080,  973);
+    valves["bf01"] = new Valve("hof3.bf01", stage, bfEng, bfDeeng, 1080,  973);
 
 
 /*
