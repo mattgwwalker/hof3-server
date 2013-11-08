@@ -20,17 +20,9 @@ class EventSource(Resource):
         deferreds = []
         if "x" in request.args:
             address = request.args["x"][0]
-            d = self.plcClient.instance.getRegister(address)
+            d = self.plcClient.getRegister(address)
             def onResult(data):
                 response["x"] = data
-            d.addCallback(onResult)
-            deferreds.append(d)
-        if "plctime" in request.args:
-            plcTime = PLCTime(self.plcClient)
-            d = plcTime.get()
-            def onResult(data):
-                response["time"] = data.isoformat() # The default 'T' character is 
-                                                     # important for Firefox
             d.addCallback(onResult)
             deferreds.append(d)
         if "bit" in request.args:

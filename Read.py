@@ -11,9 +11,9 @@ import collections
 
 class Root(PLCObject):
     def __init__(self, plc):
-        PLCObject.__init__(self, plc, "root")
-        self.addObject( plc )
-
+        PLCObject.__init__(self, plc)
+        self.addChild("hof3", plc)
+        self.addChild("time", PLCTime(plc))
 
 def getPLCResponse(plc, requestArgs):
     response = collections.OrderedDict()
@@ -80,12 +80,13 @@ class Read(Resource):
     isLeaf = True
     def __init__(self, plc):
         self.plc = plc        
-
+        self.root = Root(plc)
 
     def render_GET(self, request):
         request.setHeader("Content-Type","application/json");
 
-        d = getPLCResponse( self.plc, request.args )
+        obj = request.args["obj"][0].split(",")
+        d = self.root.getChild( obj[0] )
         def onResult(data):
             request.write( json.dumps(data) )
             request.finish()

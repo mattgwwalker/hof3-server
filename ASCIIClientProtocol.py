@@ -5,7 +5,6 @@ from twisted.protocols.basic import LineReceiver
 from collections import deque
 import datetime
 
-from PLCObjects import PLCTime
 
 
 class _Command:

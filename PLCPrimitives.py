@@ -11,13 +11,14 @@ def PLCUserMemory(index):
 
 
 class PLCPrimitive:
+    """Objects of this type must output JSON-able results"""
     def __init__(self, plc):
         self.plc = plc
         
     def get(self):
         raise NotImplementedError("get() has not been defined for this PLCPrimitive")
 
-    def set(self):
+    def set(self, value):
         raise NotImplementedError("set() has not been defined for this PLCPrimitive")
 
 
@@ -118,6 +119,33 @@ class PLCBit(PLCPrimitive):
 
 
         
+class PLCBitSet(PLCPrimitive):
+    def __init__(self, plc, addresses, labels):
+        """Labels are defined least-significant-bit first."""
+        PLCPrimitive.__init__(self, plc)
+        self.addresses = addresses
+        self.labels = labels
+        
+    def get(self):
+        deferreds = []
+        for a in self.addresses:
+            deferreds.append( self.plc.getRawRegister(a) )
+
+        def getResult(data):
+            result = collections.OrderedDict()
+            for i in range(len(data)):
+                assert data[i] != "" # If this happens then you've probably got the wrong memory address
+                word = int(data[i])
+                mask = 1
+                for j in range(len(self.labels[i])):
+                    result[self.labels[i][j]] = (word & mask) > 0
+                    mask = mask << 1
+            return result
+        d = defer.gatherResults( deferreds )
+        d.addCallback( getResult )
+        return d
+
+
 
 
 class PLCInt(PLCPrimitive):
@@ -159,10 +187,10 @@ class PLCEnum(PLCInt):
     
 
 class PLCFixed(PLCPrimitive):
-    def __init__(self, plc, address, decimalPlace):
+    def __init__(self, plc, address, scaleFactor):
         PLCPrimitive.__init__(self, plc)
         self.address = address
-        self.decimalPlace = decimalPlace
+        self.scaleFactor = scaleFactor
 
     def get(self):
         # It's necessary to get this as a raw result as sometimes
@@ -171,7 +199,7 @@ class PLCFixed(PLCPrimitive):
         d = self.plc.getRawRegister(self.address) 
         def onResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
-            return int(data)/float(10**self.decimalPlace)
+            return int(data)/float(self.scaleFactor)
         d.addCallback( onResult )
         return d
 
@@ -182,3 +210,26 @@ class PLCFixed(PLCPrimitive):
             return None
         d.addCallback( onResult )
         return d
+
+
+class PLCAnalogueInput(PLCFixed):
+    def __init__(self, plc, address, scaleFactor):
+        PLCFixed.__init__(self, plc, address, scaleFactor)
+
+    def get(self):
+        # It's necessary to get this as a raw result as sometimes
+        # the result my be returned with a decimal point (possibly
+        # incorrectly positioned).
+        d = self.plc.getRawRegister(self.address) 
+        def onResult(data):
+            assert data != "" # If this happens then you've probably got the wrong memory address
+            data = int(data)
+            if data == -32768:
+                return "disconnected"
+            else:
+                return data/float(self.scaleFactor)
+        d.addCallback( onResult )
+        return d
+
+    def set(self, value):
+        raise Exception("Do not try to write to an analoue input, it's overwritten every scan")
