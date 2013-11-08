@@ -1,6 +1,3 @@
-from ASCIIClientProtocol import ASCIIClientFactory
-from HOF3 import *
-from PLCObjects import *
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
 from twisted.internet import task, defer
@@ -8,61 +5,29 @@ from twisted.internet import task, defer
 import json
 import datetime
 
+from ASCIIClientProtocol import ASCIIClientFactory
+from HOF3 import *
+from PLCObjects import *
+from Read import Root
+
 
 class EventSource(Resource):
     isLeaf = True
-    def __init__(self, plcClient):
-        self.plcClient = plcClient        
+    def __init__(self, plc):
+        self.plc = plc
+        self.root = Root(plc)
 
     def processEvent(self, request):
-        # Obtain variables from query string
-        response = {}
-        deferreds = []
-        if "x" in request.args:
-            address = request.args["x"][0]
-            d = self.plcClient.getRegister(address)
-            def onResult(data):
-                response["x"] = data
-            d.addCallback(onResult)
-            deferreds.append(d)
-        if "bit" in request.args:
-            bit = PLCBit(self.plcClient, 249, 0)
-            d = bit.get()
-            def onResult(data):
-                response["bit"] = data
-            d.addCallback(onResult)
-            deferreds.append(d)
-        if "inputs" in request.args:
-            bitSet = PLCBitSet(self.plcClient, 249, ["DI1","DI2","DI3","DI4","DI5","DI6","DI7","DI8"])
-            d = bitSet.get()
-            def onResult(data):
-                response["inputs"] = data
-            d.addCallback(onResult)
-            deferreds.append(d)
-
-        # Go through the objects in the PLC and check if they've been requested
-        for name,obj in self.plcClient.objects.items():
-            if name in request.args:
-                d = obj.get()
-                def make_onResult(n):
-                    def f(d):
-                        response[n] = d
-                    return f
-                onResult = make_onResult(name)
-                d.addCallback( onResult )
-                deferreds.append(d)
-            
-        # Write event when all the data requested has been obtained
-        def writeEvent(data):
-            if "time" in request.args:
-                response["time"] = datetime.datetime.now().isoformat()
-            
-            #print "Writing event for response:",response
+        objText = request.args["obj"][0]
+        labels = objText.split(",")
+        
+        d = self.root.get(labels)
+        def onResult(data):
             request.write("\nevent:\n")
-            request.write("data: "+json.dumps(response)+"\n")
-
-        d = defer.gatherResults( deferreds )
-        d.addCallback( writeEvent )
+            request.write("data: "+data+"\n")
+            return data
+        d.addCallback(onResult)
+        return d
 
 
     def render_GET(self, request):
@@ -72,7 +37,7 @@ class EventSource(Resource):
         if "freq" in request.args:
             freq = float(request.args["freq"][0])
         else:
-            freq = 0.5 # Repeat every second by default
+            freq = 1.0 # Repeat every second by default
 
         loop = task.LoopingCall( lambda: self.processEvent(request) )
         loop.start(freq) 

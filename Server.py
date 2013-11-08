@@ -8,7 +8,7 @@ from PLCPrimitives import *
 from PLCObjects import *
 from HOF3 import HOF3Client
 
-#from EventSource import EventSource
+from EventSource import EventSource
 from Read import Read
 #from Write import Write
 
@@ -38,7 +38,7 @@ d.addCallback(onResult)
 
 # Start listening as HTTP server
 root = File("www")
-#root.putChild("events", EventSource(plc))
+root.putChild("events", EventSource(plc))
 #root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))
 factory = Site(root)

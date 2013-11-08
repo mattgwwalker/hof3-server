@@ -41,6 +41,7 @@ class Root(PLCObject):
         d.addCallback(onResult)
         return d
 
+
 class Read(Resource):
     isLeaf = True
     def __init__(self, plc):
