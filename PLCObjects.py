@@ -89,18 +89,6 @@ class PLCObject:
         """Goes through all the children and returns their results in a dictionary"""
         return self.getChildren( self._children.keys() )
 
-    def set(self, values):
-        assert len(values) == len(self._objects)
-        deferreds = []
-        for i in range(len(self._objects)):
-            obj = self._objects[i]
-            value = values[i]
-            d = obj.set(value)
-            deferreds.append(d)
-        return PLCJoin(deferreds)
-
-
-
 
     
 
@@ -176,9 +164,9 @@ class PLCPIDController(PLCObject):
         self.addChild("status", self.status)
 
         # Add the controller's 'vars'
-        self.pv = PLCFixed(self.plc, self.addressPV, 100) 
+        self.pv = PLCFixed(self.plc, self.addressPV, 1000) 
+        self.sp = PLCFixed(self.plc, self.addressSP, 1000) 
         self.cv = PLCFixed(self.plc, self.addressCV, 100) 
-        self.sp = PLCFixed(self.plc, self.addressSP, 100) 
         variables = PLCObject(self.plc)
         variables.addChild("pv", self.pv)
         variables.addChild("cv", self.cv)
@@ -204,3 +192,7 @@ class PLCPIDController(PLCObject):
     def get(self):
         return self.getChildren(["status","vars","config"])
         
+    def set(self, value):
+        valueAsInt = self.labelsCommand.index(value)
+        d = command.set(valueAsInt)
+        return d 

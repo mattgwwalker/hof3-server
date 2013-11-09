@@ -20,9 +20,6 @@ reactor.connectTCP("192.168.1.91", 10001, plc, 5)
 
 
 
-
-
-        
 # Get PLC time
 plcTime = PLCTime(plc)
 d = plcTime.get()
@@ -31,9 +28,6 @@ def onResult(data):
     return data
 d.addCallback(onResult)
 #plcTime.set(None) # Set PLC to current server time
-
-
-
 
 
 # Start listening as HTTP server
@@ -45,6 +39,13 @@ factory = Site(root)
 reactor.listenTCP(8000, factory)
 reactor.run()
 exit()
+
+
+
+
+
+
+
 
 
 
