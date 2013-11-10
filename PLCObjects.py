@@ -196,7 +196,7 @@ class PLCPIDController(PLCObject):
                              "progOutModePID", "modeManEnable", "autoInterlock", "manInterlock", 
                              "setOutputInterlock", "pidInterlock", "spRampOFFInterlock", 
                              "spRampONInterlock", "cvP"]    
-        self.labelsCommand = ["none","auto","manualSetOutput","manualPID"]
+        self.labelsCommand = ["none","auto","manual","manualSetOutput","manualPID"]
 
         self.status = PLCBitSet(self.plc, [self.addressStatus], [self.labelsStatus])
         self.addChild("status", self.status)
@@ -205,10 +205,12 @@ class PLCPIDController(PLCObject):
         self.pv = PLCFixed(self.plc, self.addressPV, 1000) 
         self.sp = PLCFixed(self.plc, self.addressSP, 1000) 
         self.cv = PLCFixed(self.plc, self.addressCV, 100) 
+        self.rampTarget = PLCFixed(self.plc, self.addressSPRampTarget, 100) 
         variables = PLCObject(self.plc)
         variables.addChild("pv", self.pv)
         variables.addChild("cv", self.cv)
         variables.addChild("sp", self.sp)
+        variables.addChild("rampTarget", self.rampTarget)
         self.addChild("vars", variables)
 
         # Add the controller's 'config' variables
@@ -216,10 +218,14 @@ class PLCPIDController(PLCObject):
         self.p = PLCFixed(self.plc, self.addressP, 100)
         self.i = PLCFixed(self.plc, self.addressI, 100)
         self.d = PLCFixed(self.plc, self.addressD, 100)
+        self.rampRate = PLCFixed(self.plc, self.addressSPRampRate, 100)
+        self.rampMaxErr = PLCFixed(self.plc, self.addressSPRampMaxErr, 100)
         config = PLCObject(self.plc)
         config.addChild("p", self.p)
         config.addChild("i", self.i)
         config.addChild("d", self.d)
+        config.addChild("rampRate", self.rampRate)
+        config.addChild("rampMaxErr", self.rampMaxErr)
         self.addChild("config", config)
 
         # Add the command int
@@ -231,6 +237,12 @@ class PLCPIDController(PLCObject):
         return self.getChildren(["status","vars","config"])
         
     def set(self, value):
-        valueAsInt = self.labelsCommand.index(value)
-        d = command.set(valueAsInt)
-        return d 
+        try:
+            valueAsInt = self.labelsCommand.index(value)
+            d = self.command.set(valueAsInt)
+            return d 
+        except ValueError:
+            d = defer.Deferred()
+            result = "Could not set command to '"+value+"'; valid choices for command are: "+str(self.labelsCommand)+"."
+            d.callback( result )
+            return d

@@ -93,11 +93,25 @@ var maxAge;  // in seconds
 var eventSource;
 
 
+// getChild() takes an object (data) and returns a child from within
+// the object.  The path traversed is in dot-notation.  For example,
+// the path "hof3.iv08" will first find the child "hof3" and then its
+// child "iv08", which will then be returned.
+function getChild(data, path) {
+    parts = path.split(".");
+    for (i=0; i<parts.length; i++) {
+        data = data[parts[i]];
+    }
+    return data
+}
+
+
+
 function openEventSource(controller) {
     var queryString = "";
     var updateFreq = 1; // seconds
     //var queryIDs = [controller.pv.id, controller.sp.id, controller.cv.id];
-    var queryIDs = [controller.id];
+    var queryIDs = [controller.id+".vars"];
     var queryParts = [];
     
     queryIDs.push("time");
@@ -151,14 +165,56 @@ function onChangeController() {
 
     // Get controller details
     $.ajax( {
-        url: "READ CONTROLLER DETAILS HERE",
+        url: "read?obj="+controller.id,
             type: "GET"
         })
         .done( function(data) {
             // Display details
+            data = getChild(data, controller.id);
+            console.log("Received controller details",data);
+
+            // Automaitc or manual state
+            if (data.status.modeMan) {
+                // We're in manual
+                if (data.status.modePID) {
+                    // We're in manual PID mode
+                    $("#ConfigurePID_ManualPIDBtn").attr("checked",true).checkboxradio("refresh");
+                    $("#ConfigurePID_ContainerNewTarget").show();
+                    $("#ConfigurePID_ContainerNewOutput").hide();
+                } else {
+                    // We're in manual setpoint mode
+                    $("#ConfigurePID_ManualOutputBtn").attr("checked",true).checkboxradio("refresh");
+                    $("#ConfigurePID_ContainerNewTarget").hide();
+                    $("#ConfigurePID_ContainerNewOutput").show();
+                }
+            } else {
+                // We're in automatic
+                $("#ConfigurePID_AutomaticBtn").attr("checked",true).checkboxradio("refresh");
+                $("#ConfigurePID_ContainerNewTarget").hide();
+                $("#ConfigurePID_ContainerNewOutput").hide();
+            }
+
+
+            // P, I, and D values
+            $("#ConfigurePID_p").val(data.config.p);
+            $("#ConfigurePID_i").val(data.config.i);
+            $("#ConfigurePID_d").val(data.config.d);
+
+            // Set-point ramping
+            $("#ConfigurePID_RampRate").val(data.config.rampRate);
+            $("#ConfigurePID_RampMaxError").val(data.config.rampMaxErr);
+            if (data.status.modeSpRamp) {
+                $("#ConfigurePID_SetpointRampingBtn").attr("checked",true).checkboxradio("refresh");
+                $("#ConfigurePID_ContainerRamping").show();
+            } else {
+                $("#ConfigurePID_ImmediateSetpointChangesBtn").attr("checked",true).checkboxradio("refresh");
+                $("#ConfigurePID_ContainerRamping").hide();
+            }
+
+            $("#ConfigurePID_ContainerControllerDetails").show();
         })
         .fail( function(data) {
-            showError("Failed to get controller details.  Are you still connected to HOF3?");
+            showError("Error","Failed to get controller details.  Are you still connected to HOF3?");
         });
 
 }
@@ -243,13 +299,6 @@ function updatePoints(t, pv, sp, cv) {
 
 
 
-function getChild(data, path) {
-    parts = path.split(".");
-    for (i=0; i<parts.length; i++) {
-        data = data[parts[i]];
-    }
-    return data
-}
 
 
 function getPoints(event, controller) {
