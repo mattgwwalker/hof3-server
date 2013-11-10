@@ -124,8 +124,13 @@ class ASCIIClientFactory(protocol.ClientFactory):
         return self.addCommand(_Command.GETRAW, address)
         
     def setRegister(self, address, value):
-        return self.addCommand(_Command.SET, address, value)
-
+        """Sets the register to the given value and checks that the returned result was an empty string"""
+        d = self.addCommand(_Command.SET, address, value)
+        def onResult(data):
+            assert data == ""
+            return None
+        d.addCallback(onResult)
+        return d
 
 
 

@@ -165,12 +165,7 @@ class PLCInt(PLCPrimitive):
         return d
 
     def set(self, value):
-        d = self.plc.setRegister(self.address, value)
-        def getResult(data):
-            assert data == ""
-            return None
-        d.addCallback( getResult )
-        return d
+        return self.plc.setRegister(self.address, value)
         
 
 class PLCEnum(PLCInt):
@@ -204,12 +199,8 @@ class PLCFixed(PLCPrimitive):
         return d
 
     def set(self, value):
-        d = self.plc.setRegister(self.address, value)
-        def onResult(data):
-            assert data == ""
-            return None
-        d.addCallback( onResult )
-        return d
+        value = int(round(value*self.scaleFactor)/self.scaleFactor)
+        return self.plc.setRegister(self.address, value)
 
 
 class PLCAnalogueInput(PLCFixed):

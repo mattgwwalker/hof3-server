@@ -10,7 +10,7 @@ from HOF3 import HOF3Client
 
 from EventSource import EventSource
 from Read import Read
-#from Write import Write
+from Write import Write
 
 
 # Create connection to PLC
@@ -30,10 +30,15 @@ d.addCallback(onResult)
 #plcTime.set(None) # Set PLC to current server time
 
 
+
+
+
+
+
 # Start listening as HTTP server
 root = File("www")
 root.putChild("events", EventSource(plc))
-#root.putChild("write", Write(plc))
+root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))
 factory = Site(root)
 reactor.listenTCP(8000, factory)
@@ -52,6 +57,26 @@ exit()
 
 # /////////////////////////
 # What follows is test code
+
+
+
+iv08 = PLCEnergisable( plc, PLCUserMemory(550) )
+
+group = PLCObject(plc)
+group.addChild("iv08", iv08)
+
+d = group.setChild("iv08", "manual")
+
+
+
+
+
+
+
+
+
+
+
 iv08 = PLCEnergisable( plc, PLCUserMemory(550) )
 cpuUsage = PLCInt(plc, 8434)
 pc01 = PLCPIDController( plc, PLCUserMemory(670) )

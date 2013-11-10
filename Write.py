@@ -5,40 +5,36 @@ from twisted.internet import defer
 
 import json
 
+from Read import Root
+from PLCObjects import merge
 
 class Write(Resource):
     isLeaf = True
-    def __init__(self, plcClient):
-        self.plcClient = plcClient        
-
+    def __init__(self, plc):
+        self.plc = plc
+        self.root = Root(plc)
 
     def render_POST(self, request):
+        request.setHeader("Content-Type","application/json");
+
+        # Go through the request to find the objects and values to write
         deferreds = [];
-        # Go through the objects in the PLC and check if they've been set
-        for name,obj in self.plcClient.objects.items():
-            if name in request.args:
-                d = obj.set( request.args[name][0] ) # only using the first of possibly multiple values
-                deferreds.append(d)
-        
-        allResults = defer.gatherResults( deferreds )
-        def onSuccess(data):
-            request.write('{ "result" : "success" }')
+        for label in request.args:
+            value = request.args[label][0] # using only the first of possibly multiple values
+            deferreds.append( self.root.setChild(label, value) )
+
+        d = defer.gatherResults( deferreds )
+        def onResult(data):
+            result = {}
+            for d in data:
+                merge(result, d)
+            
+            request.write( json.dumps(result) )
             request.finish()
-        def onError(data):
-            request.write('{ "result" : "error" }')
-            request.finish()
-        allResults.addCallback(onSuccess)
-        allResults.addErrback(onError)
+
+        d.addCallback(onResult)
 
         return NOT_DONE_YET
-
-        # Extract variables and values to write
-        #for address,values in request.args.items():
-        #    value = values[0]
-        #    print "Writing ",value," into address ",address
-        #    d = self.plcClient.instance.setRegister(address, value)
-
-        #return "Done like a doolalie"
 
 
     def render_GET(self, request):

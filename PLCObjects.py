@@ -27,7 +27,10 @@ def merge(a, b, path=None):
             elif a[key] == b[key]:
                 pass # same values in both leaves
             else:
-                raise Exception("Conflict at "+join(path + [str(key)]))
+                if key=="error":
+                    a[key] = a[key]+"  "+b[key]
+                else:
+                    raise Exception("Conflict at "+join(path + [str(key)]))
         else:
             a[key] = b[key]
     return a
@@ -66,7 +69,12 @@ class PLCObject:
         """Returns child's result in dictionary with the child's name as the key"""
         assert label is not None
         parts = label.split('.')
-        return self._getChild(parts)
+        try:
+            return self._getChild(parts)
+        except KeyError:
+            d = defer.Deferred()
+            d.callback( { "error" : "Could not find child named '"+label+"'." } )
+            return d
 
     def getChildren(self, children):
         """Goes through specified children and returns their results in a dictionary"""
@@ -88,6 +96,30 @@ class PLCObject:
     def getAllChildren(self):
         """Goes through all the children and returns their results in a dictionary"""
         return self.getChildren( self._children.keys() )
+
+    def _setChild(self, labelsAsList, value):
+        child = self._children[labelsAsList[0]]
+        if len(labelsAsList) == 1:
+            d = child.set(value)
+        else:
+            d = child._setChild(labelsAsList[1:], value)
+        def onResult(data):
+            if data is None:
+                data = True # Set if everything worked ok
+            return { labelsAsList[0] : data }
+        d.addCallback(onResult)
+        return d
+
+    def setChild(self, label, value):
+        """Sets the child's value"""
+        assert label is not None
+        parts = label.split('.')
+        try:
+            return self._setChild(parts, value)
+        except KeyError:
+            d = defer.Deferred()
+            d.callback( { "error" : "Could not find child named '"+label+"'." } )
+            return d
 
 
     
@@ -127,9 +159,15 @@ class PLCEnergisable(PLCObject):
         return self.getChildren(["status"])
 
     def set(self, value):
-        valueAsInt = self.labelsCommand.index(value)
-        d = command.set(valueAsInt)
-        return d 
+        try:
+            valueAsInt = self.labelsCommand.index(value)
+            d = self.command.set(valueAsInt)
+            return d 
+        except ValueError:
+            d = defer.Deferred()
+            result = "Could not set command to '"+value+"'; valid choices for command are: "+str(self.labelsCommand)+"."
+            d.callback( result )
+            return d
         
 
 class PLCPIDController(PLCObject):
