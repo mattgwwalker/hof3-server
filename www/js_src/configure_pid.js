@@ -49,11 +49,11 @@ var controllers = {
                       label : "DPC01: Along-membrane controller (master controller for pump speed) IN TESTING",
                       pv : { label : "???",
                              units : ["barg", " barg"],
-                             rounding : 1,
+                             rounding : 2,
                              id : "vars.pv" },
                       sp : { label : "Setpoint",
                              units : ["barg", " barg"],
-                             rounding : 1,
+                             rounding : 2,
                              id : "vars.sp" },
                       cv : { label : "CV01",
                              units : ["%", "%"],
@@ -179,18 +179,21 @@ function onChangeController() {
                 if (data.status.modePID) {
                     // We're in manual PID mode
                     $("#ConfigurePID_ManualPIDBtn").attr("checked",true).checkboxradio("refresh");
-                    $("#ConfigurePID_ContainerNewTarget").show();
+                    $("#ConfigurePID_ContainerNewSetPoint").show();
+                    $("#ConfigurePID_ContainerNewRampTarget").hide();
                     $("#ConfigurePID_ContainerNewOutput").hide();
                 } else {
-                    // We're in manual setpoint mode
+                    // We're in manual setpoint mode FIXME:ramping?
                     $("#ConfigurePID_ManualOutputBtn").attr("checked",true).checkboxradio("refresh");
-                    $("#ConfigurePID_ContainerNewTarget").hide();
+                    $("#ConfigurePID_ContainerNewSetPoint").hide();
+                    $("#ConfigurePID_ContainerNewRampTarget").hide();
                     $("#ConfigurePID_ContainerNewOutput").show();
                 }
             } else {
                 // We're in automatic
                 $("#ConfigurePID_AutomaticBtn").attr("checked",true).checkboxradio("refresh");
-                $("#ConfigurePID_ContainerNewTarget").hide();
+                $("#ConfigurePID_ContainerNewSetPoint").hide();
+                $("#ConfigurePID_ContainerNewRampTarget").hide();
                 $("#ConfigurePID_ContainerNewOutput").hide();
             }
 
@@ -374,26 +377,182 @@ function getDetail() {
 }
 
 
+function writeCommand(command) {
+    // Disable all buttons
+    console.log("disabling buttons");
+    $("#ConfigurePID_AutomaticBtn").checkboxradio("disable");
+    $("#ConfigurePID_ManualPIDBtn").checkboxradio("disable");
+    $("#ConfigurePID_ManualOutputBtn").checkboxradio("disable");
+
+    // Send command
+    $.ajax( {
+        url: "write?"+controller.id+"="+command,
+            type: "GET"
+        })
+        .done( function(data) {
+            // Check we have successfully written the command
+            data = getChild(data, controller.id);
+            if (data != true) {
+                // Failed to write command
+                showError("Error","Failed to set controller to '"+command+"'.  "+data);
+            }                
+            // Reenable buttons
+            console.log("reenabling buttons");
+            $("#ConfigurePID_AutomaticBtn").checkboxradio("enable");
+            $("#ConfigurePID_ManualPIDBtn").checkboxradio("enable");
+            $("#ConfigurePID_ManualOutputBtn").checkboxradio("enable");
+            
+        })
+        .fail( function(data) {
+            showError("Error","Failed to set controller to '"+command+"'.  Are you still connected to HOF3?");
+            // Reenable buttons
+            console.log("reenabling buttons");
+            $("#ConfigurePID_AutomaticBtn").checkboxradio("enable");
+            $("#ConfigurePID_ManualPIDBtn").checkboxradio("enable");
+            $("#ConfigurePID_ManualOutputBtn").checkboxradio("enable");
+        });
+}
+
 
 // Interface: Automatic button
 function onClickAutomaticBtn() {
     // Hide the inputs for manual values
-    $("#ConfigurePID_ContainerNewTarget").hide();
+    $("#ConfigurePID_ContainerNewSetPoint").hide();
+    $("#ConfigurePID_ContainerNewRampTarget").hide();
     $("#ConfigurePID_ContainerNewOutput").hide();
+
+    writeCommand("auto");
 }
 
 
 // Interface: Manual PID button
 function onClickManualPIDBtn() {
-    $("#ConfigurePID_ContainerNewTarget").show();
+    $("#ConfigurePID_ContainerNewSetPoint").show();
+    $("#ConfigurePID_ContainerNewRampTarget").hide();
     $("#ConfigurePID_ContainerNewOutput").hide();
+
+    writeCommand("manual");
+    writeCommand("manualPID");
 }
 
 
 // Interface: Manual Output button
 function onClickManualOutputBtn() {
-    $("#ConfigurePID_ContainerNewTarget").hide();
+    $("#ConfigurePID_ContainerNewSetPoint").hide();
+    $("#ConfigurePID_ContainerNewRampTarget").hide();
     $("#ConfigurePID_ContainerNewOutput").show();
+
+    writeCommand("manual");
+    writeCommand("manualSetOutput");
+}
+
+
+function write(variableID, value) {
+    return $.ajax( {
+        url: "write?"+variableID+"="+value,
+            type: "GET"
+        })
+        .done( function(data) {
+            // Check we have successfully written the command
+            data = getChild(data, variableID);
+            if (data != true) {
+                // Failed to write command
+                showError("Error","Failed to set variable '"+variableID+"' to '"+value+"'.  "+data);
+            }                
+        })
+        .fail( function(data) {
+            showError("Error","Failed to set variable '"+variableID+"' to '"+value+"'.  Are you still connected to HOF3?");
+        });
+}
+
+function writeValue(variableID, value) {
+    $.ajax( {
+        url: "write?"+variableID+"="+value,
+            type: "GET"
+        })
+        .done( function(data) {
+            // Check we have successfully written the command
+            data = getChild(data, variableID);
+            if (data != true) {
+                // Failed to write command
+                showError("Error","Failed to set variable to '"+value+"'.  "+data);
+            }                
+            // Reenable input
+            console.log("reenabling input");
+            $("#ConfigurePID_NewSetPoint").textinput("enable");
+            $("#ConfigurePID_NewRampTarget").textinput("enable");
+            $("#ConfigurePID_NewOutput").textinput("enable");
+        })
+        .fail( function(data) {
+            showError("Error","Failed to set variable to '"+value+"'.  Are you still connected to HOF3?");
+
+            // Reenable input
+            console.log("reenabling input");
+            $("#ConfigurePID_NewSetPoint").textinput("enable");
+            $("#ConfigurePID_NewRampTarget").textinput("enable");
+            $("#ConfigurePID_NewOutput").textinput("enable");
+        });
+}
+
+// Interface: Setpoint value
+function onChangeSetPoint() {
+    // Disable input
+    $("#ConfigurePID_NewSetPoint").textinput("disable");
+    $("#ConfigurePID_NewRampTarget").textinput("disable");
+    $("#ConfigurePID_NewOutput").textinput("disable");
+
+    // Get value
+    var setpoint = $("#ConfigurePID_NewSetPoint").val()
+    
+    // Send command
+    var variableID = controller.id+"."+controller.sp.id;
+    writeValue(variableID, setpoint);
+}
+
+// Interface: Setpoint value
+function onChangeOutput() {
+    // Disable input
+    $("#ConfigurePID_NewSetPoint").textinput("disable");
+    $("#ConfigurePID_NewRampTarget").textinput("disable");
+    $("#ConfigurePID_NewOutput").textinput("disable");
+
+    // Get value
+    var output = $("#ConfigurePID_NewOutput").val()
+    
+    // Send command
+    var variableID = controller.id+"."+controller.cv.id;
+    writeValue(variableID, output);
+}
+
+
+// Interface: p value
+function onChangeP() {
+    // Get value
+    var value = $("#ConfigurePID_p").val()
+    var variableID = controller.id+".config.p";
+
+    // Send command
+    write(variableID, value);
+}
+
+// Interface: i value
+function onChangeI() {
+    // Get value
+    var value = $("#ConfigurePID_i").val()
+    var variableID = controller.id+".config.i";
+
+    // Send command
+    write(variableID, value);
+}
+
+// Interface: d value
+function onChangeD() {
+    // Get value
+    var value = $("#ConfigurePID_d").val()
+    var variableID = controller.id+".config.d";
+
+    // Send command
+    write(variableID, value);
 }
 
 
@@ -426,7 +585,14 @@ $(document).on( "pageinit", "#ConfigurePID_Page", function(event) {
     $("#ConfigurePID_AutomaticBtn").click(onClickAutomaticBtn);
     $("#ConfigurePID_ManualPIDBtn").click(onClickManualPIDBtn);
     $("#ConfigurePID_ManualOutputBtn").click(onClickManualOutputBtn);
+
+    $("#ConfigurePID_NewOutput").change(onChangeOutput);
+    $("#ConfigurePID_NewSetPoint").change(onChangeSetPoint);
     
+    $("#ConfigurePID_p").change(onChangeP);
+    $("#ConfigurePID_i").change(onChangeI);
+    $("#ConfigurePID_d").change(onChangeD);
+
     $("#ConfigurePID_SetpointRampingBtn").click(onClickSetpointRampingBtn);
     $("#ConfigurePID_ImmediateSetpointChangesBtn").click(onClickImmediateSetpointChangesBtn);
 

@@ -165,6 +165,7 @@ class PLCInt(PLCPrimitive):
         return d
 
     def set(self, value):
+        value = int(value)
         return self.plc.setRegister(self.address, value)
         
 
@@ -199,7 +200,11 @@ class PLCFixed(PLCPrimitive):
         return d
 
     def set(self, value):
-        value = int(round(value*self.scaleFactor)/self.scaleFactor)
+        value = float(value)
+        print "original value:",value
+        print "scale factor:",self.scaleFactor
+        value = int(round(value*self.scaleFactor))
+        print "writing value:",value
         return self.plc.setRegister(self.address, value)
 
 

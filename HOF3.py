@@ -9,6 +9,9 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         ASCIIClientFactory.__init__(self)
         PLCObject.__init__(self, self)
 
+        # Analogue Inputs
+        self.addChild("pt02", PLCFixed( self, 269, 1000 ))
+        
         # Backflush valve
         self.addChild("bf01", PLCEnergisable( self, PLCUserMemory(370) ))
 

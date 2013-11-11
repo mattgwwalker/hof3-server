@@ -9,6 +9,9 @@ from PLCObjects import *
 from HOF3 import HOF3Client
 
 from EventSource import EventSource
+from Test import Test
+from Test2 import Test2
+
 from Read import Read
 from Write import Write
 
@@ -40,6 +43,8 @@ root = File("www")
 root.putChild("events", EventSource(plc))
 root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))
+root.putChild("test", Test(plc))
+root.putChild("test2", Test2(plc))
 factory = Site(root)
 reactor.listenTCP(8000, factory)
 reactor.run()
