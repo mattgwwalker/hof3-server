@@ -170,9 +170,9 @@ class PLCInt(PLCPrimitive):
         
 
 class PLCEnum(PLCInt):
-    def __init__(self, plc, address, states, label):
-        PLCInt.__init__(self, plc, address, label)
-        self._states = states
+    def __init__(self, plc, address, values):
+        PLCInt.__init__(self, plc, address)
+        self._values = values
 
     #def get(self):
         # returns both the value and its descriptive state
@@ -181,6 +181,64 @@ class PLCEnum(PLCInt):
             # data is a dict
             #data["state"] = self._states[data
     
+    def set(self, value):
+        try:
+            valueAsInt = self._values.index(value)
+            d = PLCInt.set(self, valueAsInt)
+            return d 
+        except ValueError:
+            d = defer.Deferred()
+            result = "Could not set enum to '"+value+"'; valid choices for enum are: "+str(self._values)+"."
+            d.callback( result )
+            return d
+
+
+class PLCTimer(PLCPrimitive):
+    def __init__(self, plc, address):
+        PLCPrimitive.__init__(self, plc)
+        self._addressSeconds = address
+        self._addressMinutes = address+1
+
+        self.seconds = PLCFixed(plc, self._addressSeconds, 10)
+        self.minutes = PLCInt(plc, self._addressMinutes)
+
+    def get(self):
+        d1 = self.minutes.get() 
+        d2 = self.seconds.get() 
+        d = defer.gatherResults( [d1,d2] )
+        def onResult(data):
+            mins, secs = data
+            print "mins:",mins
+            print "secs:",secs
+            return int(mins)*60 + int(secs)
+        d.addCallback( onResult )
+        return d
+
+    def set(self, value):
+        """Takes a value in seconds and separates it for the timer.  If the
+        value is negative, then the tenths of seconds if set to -1 and minutes
+        to 0.
+        """
+        if value < 0:
+            minutes = 0
+            seconds = -1
+        else :
+            minutes = int(value) / 60
+            seconds = float(value) % 60
+
+        print "writing minutes:",minutes,"seconds:",seconds
+
+        d1 = self.minutes.set(minutes)
+        d2 = self.seconds.set(seconds)
+        d = defer.gatherResults( [d1, d2] )
+
+        def onResults(data):
+            a,b = data
+            assert a==None and b==None
+            return None
+        d.addCallback(onResults)
+        return d
+
 
 class PLCFixed(PLCPrimitive):
     def __init__(self, plc, address, scaleFactor):
@@ -201,10 +259,7 @@ class PLCFixed(PLCPrimitive):
 
     def set(self, value):
         value = float(value)
-        print "original value:",value
-        print "scale factor:",self.scaleFactor
         value = int(round(value*self.scaleFactor))
-        print "writing value:",value
         return self.plc.setRegister(self.address, value)
 
 

@@ -56,12 +56,15 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790) ))
 
         # General
-        self.addChild("cpu_usage", PLCInt(self, 8434))
-        self.addChild("macro_size", PLCInt(self, 4433))
+        self.addChild("cpuUsage", PLCInt(self, 8434))
+        self.addChild("macroSize", PLCInt(self, 4433))
         self.addChild("time", PLCTime(self))
 
 
-        self.addChild("command", PLCInt(self, PLCUserMemory(900)))
+        self.addChild("command", 
+                      PLCEnum(self, 
+                              PLCUserMemory(900),
+                              ["none","ack_end","stop_ack","stop","prod_ack","prod"]))
         # This is more of an enum type... 
         # 0: None, 
         # 2: Stop with pushbutton acknowledgement, 
@@ -69,3 +72,11 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         # 4: Production with retentate bleed and permeate out, with bushbutton acklnowledgement
         # 5: as above, immediately
 
+        self.addChild("fillSource", PLCInt( self, PLCUserMemory(924) ))
+
+        self.addChild("timeLimitForPushButtonAck", PLCTimer( self, PLCUserMemory(910) ))
+
+
+        PLCUserMemory(923)
+        labels = ["Msg1","IL01Fault","PB01toPause","PB01toRestart","PP01Stop","DPC01PIDHold","PC01PIDHold","PC05PIDHold","RC01PIDHold","FD100Pause","FD101Pause"]
+        self.addChild("fault", PLCBitSet(self, [PLCUserMemory(923)], [labels]))

@@ -2,3 +2,6 @@ For the canvas-based display of the plant, when the images are first
 loaded the are incorrectly positioned; a refresh is required.  Fix
 this by waiting till the images are loaded before calculating their
 positions.
+
+Clear the buffer for when the controller first connects (so that we
+don't get data from an old request when we first start up.
