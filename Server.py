@@ -24,7 +24,7 @@ reactor.connectTCP("192.168.1.91", 10001, plc, 5)
 
 
 # Get PLC time
-plcTime = PLCTime(plc)
+plcTime = PLCSystemTime(plc)
 d = plcTime.get()
 def onResult(data):
     print "PLC Time is",data
@@ -62,6 +62,16 @@ exit()
 
 # /////////////////////////
 # What follows is test code
+
+# Read log value
+log1 = PLCInt(plc, 493)
+d = log1.get()
+def onResult(data):
+    print "Log1:",data
+    return data
+d.addCallback(onResult)
+
+
 
 
 

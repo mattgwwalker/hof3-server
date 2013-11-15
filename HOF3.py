@@ -58,25 +58,82 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         # General
         self.addChild("cpuUsage", PLCInt(self, 8434))
         self.addChild("macroSize", PLCInt(self, 4433))
-        self.addChild("time", PLCTime(self))
+        self.addChild("time", PLCSystemTime(self))
 
 
         self.addChild("command", 
                       PLCEnum(self, 
-                              PLCUserMemory(900),
-                              ["none","ack_end","stop_ack","stop","prod_ack","prod"]))
+                              PLCUserMemory(890),
+                              #{0:"none",1:"ack_end",2:"pushbutton",3:"stop",4:"recirc",5:"pause",6:"abort"}))
+                              ["none","ack_end","pushbutton","stop","recirc","pause","abort"])) #FIXME: Should use a dictionary
         # This is more of an enum type... 
         # 0: None, 
+        # 1: Acknowledge the end of a process (e.g. production has ended)
         # 2: Stop with pushbutton acknowledgement, 
         # 3: Stop immediately
         # 4: Production with retentate bleed and permeate out, with bushbutton acklnowledgement
         # 5: as above, immediately
+        # 7: pause
+        # 9: abort
 
-        self.addChild("fillSource", PLCInt( self, PLCUserMemory(924) ))
+        labels = ["Unknown","Product Full","Product Empty","Rinse Full","Rinse Empty","CIP Full","CIP Empty"]
+        self.addChild("plantStatus", PLCEnum( self, PLCUserMemory(925), labels ))
 
-        self.addChild("timeLimitForPushButtonAck", PLCTimer( self, PLCUserMemory(910) ))
+        labels = ["none","site","water","chemical","manualChemical"]
+        self.addChild("fillSource", PLCEnum( self, PLCUserMemory(924), labels ))
+        self.addChild("fillLevel", PLCFixed( self, PLCUserMemory(210), 100 ))
+        self.addChild("fillLevelHysteresis", PLCFixed( self, PLCUserMemory(211), 100 )) # Advanced. Delta as percentage point of fill level.  Starts filling at fillLevel - hysteresis; stops filling at fillLevel + hysteresis.  Setting this too low may produce multi-dosed chemicals.
+        self.addChild("startLevel", PLCFixed( self, PLCUserMemory(212), 100)) # Moves from filling the tank to mixing.  It's import that this level is sufficiently high for CIP, as this is the water level that dilutes the chemical during mixing.
+        self.addChild("startLevelHysteresis", PLCFixed( self, PLCUserMemory(213), 100)) # Advanced.
+
+        self.addChild("endLevel", PLCFixed( self, PLCUserMemory(214), 100)) # At the end of production, we empty the tank to site.  Once we've achieved this level, we dump to drain.
+
+        self.addChild("emptyLevel", PLCFixed( self, PLCUserMemory(215), 100)) # While empying the plant, the pump is used to pump out the liquid.  At this level, the pump is turned off. 
 
 
-        PLCUserMemory(923)
+        # Timer-based setpoints
+        self.addChild("pushButtonAckTimeSP", PLCTimer( self, PLCUserMemory(910) )) 
+        self.addChild("mixTimeSP", PLCTimer( self, PLCUserMemory(912) )) # -1 stops the timer
+        self.addChild("recircTimeSP", PLCTimer( self, PLCUserMemory(914) )) # -1 stops the timer
+        self.addChild("membraneUseTimeSP", PLCTimer( self, PLCUserMemory(920) )) # -1 stop the timer. If we're in recirc then we goto drain.  If we're in concentration then we terminate the filling of the tank and then head to drain.
+        self.addChild("drainTimeSP", PLCTimer( self, PLCUserMemory(916) ))
+        self.addChild("chemicalDoseSP", PLCTimer( self, PLCUserMemory(993) ))
+        self.addChild("chemicalPurgeTimeSP", PLCTimer( self, PLCUserMemory(995) )) # Time that water is pushed through after chemical dosing
+
+        self.addChild("recircToBottomTimeSP", PLCTimer( self, PLCUserMemory(934) ))
+        self.addChild("recircToTopTimeSP", PLCTimer( self, PLCUserMemory(936) ))
+        self.addChild("backwashTopTimeSP", PLCTimer( self, PLCUserMemory(938) ))
+        self.addChild("backwashBottomTimeSP", PLCTimer( self, PLCUserMemory(940) ))
+
+        self.addChild("drainRouteTimeSP", PLCTimer( self, PLCUserMemory(942) )) # During drain, time between top route and bottom route
+
+        self.addChild("backwashTimeSP", PLCTimer( self, PLCUserMemory(946) )) # -1 to disable.
+        self.addChild("directionChangeTimeSP", PLCTimer( self, PLCUserMemory(950) )) 
+
+        # Count-up timers accumulators
+        self.addChild("stepTimer", PLCTimer( self, PLCUserMemory(908) ))
+        self.addChild("membraneUseTimer", PLCTimer( self, PLCUserMemory(918) ))
+        self.addChild("chemicalDoseTimer", PLCTimer( self, PLCUserMemory(991) ))
+        self.addChild("routeStepTimer", PLCTimer( self, PLCUserMemory(932) ))
+        self.addChild("backwashTimer", PLCTimer( self, PLCUserMemory(934) ))
+        self.addChild("directionChangeTimer", PLCTimer( self, PLCUserMemory(948) ))
+
+
+
         labels = ["Msg1","IL01Fault","PB01toPause","PB01toRestart","PP01Stop","DPC01PIDHold","PC01PIDHold","PC05PIDHold","RC01PIDHold","FD100Pause","FD101Pause"]
         self.addChild("fault", PLCBitSet(self, [PLCUserMemory(923)], [labels]))
+
+        labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Fedd tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated"}
+        self.addChild("productionButtonFaultMsg", PLCEnum(self, PLCUserMemory(892), labels))
+        self.addChild("cipButtonFaultMsg", PLCEnum(self, PLCUserMemory(893), labels))
+        self.addChild("rinseFaultMsg", PLCEnum(self, PLCUserMemory(894), labels))
+
+
+        self.addChild("stepNum", PLCInt(self, 79))
+
+        self.addChild("log1", PLCInt(self, 493))
+        self.addChild("logtime", PLCLogTime(self))
+        self.addChild("logReadPtr", PLCInt(self, 491))
+        self.addChild("logWritePtr", PLCInt(self, 489))
+
+        self.addChild("pc03Counter", PLCInt(self, PLCUserMemory(953)))

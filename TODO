@@ -5,3 +5,6 @@ positions.
 
 Clear the buffer for when the controller first connects (so that we
 don't get data from an old request when we first start up.
+
+Check onClose of EventSource (in display).  Warn user if it's been
+closed.

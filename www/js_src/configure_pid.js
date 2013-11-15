@@ -16,7 +16,7 @@ var controllers = {
                              id : "vars.cv" } 
                     },
     "pc03" :        { id : "hof3.pc03",
-                      label : "PC03: Backflush pressure (P3) NOT WORKING",
+                      label : "PC03: Backflush pressure (P3) IN TESTING",
                       pv : { label : "Backflush pressure (P3)",
                              units : ["barg", " barg"],
                              rounding : 1,
@@ -46,8 +46,8 @@ var controllers = {
                              id : "vars.cv" } 
                     },
     "dpc01" :       { id : "hof3.dpc01",
-                      label : "DPC01: Along-membrane controller (master controller for pump speed) IN TESTING",
-                      pv : { label : "???",
+                      label : "DPC01: Along-membrane controller (P1-P2, master controller for pump speed)",
+                      pv : { label : "Along-membrane pressure drop (P1-P2)",
                              units : ["barg", " barg"],
                              rounding : 2,
                              id : "vars.pv" },
@@ -55,7 +55,7 @@ var controllers = {
                              units : ["barg", " barg"],
                              rounding : 2,
                              id : "vars.sp" },
-                      cv : { label : "CV01",
+                      cv : { label : "Control for PC01 (a percentage of maximum inlet pressure)",
                              units : ["%", "%"],
                              rounding : 1,
                              id : "vars.cv" } 
@@ -70,7 +70,7 @@ var controllers = {
                              units : ["barg", " barg"],
                              rounding : 1,
                              id : "vars.sp" },
-                      cv : { label : "CV01",
+                      cv : { label : "CV02",
                              units : ["%", "%"],
                              rounding : 1,
                              id : "vars.cv" } 
