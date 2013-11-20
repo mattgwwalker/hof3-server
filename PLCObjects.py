@@ -53,6 +53,7 @@ class PLCObject:
 
     def addChild(self, label, obj):
         self._children[label] = obj
+        return obj
 
     def _getChild(self, labelsAsList):
         child = self._children[labelsAsList[0]]
@@ -171,8 +172,9 @@ class PLCEnergisable(PLCObject):
         
 
 class PLCPIDController(PLCObject):
-    def __init__(self, plc, address):
+    def __init__(self, plc, address, scaleFactor):
         PLCObject.__init__(self, plc)
+        self.scaleFactor = scaleFactor
         self.addressStatus = address + 0
         self.addressCommand = address + 1
         self.addressState = address + 2
@@ -191,6 +193,8 @@ class PLCPIDController(PLCObject):
         self.addressSPRampMaxErr = address + 15
         self.addressCVMax = address + 16
         self.addressCVMaxDt = address + 17
+        self.addressSetpoints = range(address+20, address+30)
+        self.addressOutputs = range(address+30, address+40)
 
         self.labelsStatus = ["modeRev", "modeMan", "modePID", "modeSpRamp", "modeSpRampLast", 
                              "progOutModePID", "modeManEnable", "autoInterlock", "manInterlock", 
@@ -201,10 +205,15 @@ class PLCPIDController(PLCObject):
         self.status = PLCBitSet(self.plc, [self.addressStatus], [self.labelsStatus])
         self.addChild("status", self.status)
 
+        # Add a group for the setpoints
+        self.setpoints = self.addChild("setpoints", PLCObject(self.plc))
+        self.outputs = self.addChild("outputs", PLCObject(self.plc))
+
         # Add the controller's 'vars'
-        self.pv = PLCFixed(self.plc, self.addressPV, 1000) 
-        self.sp = PLCFixed(self.plc, self.addressSP, 1000) 
-        self.cv = PLCFixed(self.plc, self.addressCV, 100) 
+        self.pv = PLCFixed(self.plc, self.addressPV, self.scaleFactor) 
+        self.sp = PLCFixed(self.plc, self.addressSP, self.scaleFactor) 
+        self.cv = PLCFixed(self.plc, self.addressCV, 100) # scale factor is 100 here as the 
+                                                          # outputs are percentages
         self.rampTarget = PLCFixed(self.plc, self.addressSPRampTarget, 100) 
         variables = PLCObject(self.plc)
         variables.addChild("pv", self.pv)
@@ -233,6 +242,7 @@ class PLCPIDController(PLCObject):
         self.addChild("command", self.command)
 
 
+
     def get(self):
         return self.getChildren(["status","vars","config"])
         
@@ -246,3 +256,10 @@ class PLCPIDController(PLCObject):
             result = "Could not set command to '"+value+"'; valid choices for command are: "+str(self.labelsCommand)+"."
             d.callback( result )
             return d
+
+    def addSetpoint(self, name, index):
+        self.setpoints.addChild(name, PLCFixed(self.plc, self.addressSetpoints[index], self.scaleFactor))
+
+    def addOutput(self, name, index):
+        # Scale factor is 100 as output is a percentage
+        self.outputs.addChild(name, PLCFixed(self.plc, self.addressOutputs[index], 100))

@@ -49,11 +49,13 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("pp03", PLCEnergisable( self, PLCUserMemory(620) ))
 
         # PID Controllers
-        self.addChild("pc01", PLCPIDController( self, PLCUserMemory(670) ))
-        self.addChild("pc03", PLCPIDController( self, PLCUserMemory(710) ))
-        self.addChild("pc05", PLCPIDController( self, PLCUserMemory(750) ))
-        self.addChild("dpc01",PLCPIDController( self, PLCUserMemory(630) ))
-        self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790) ))
+        self.addChild("pc01", PLCPIDController( self, PLCUserMemory(670), 1000 ))
+        self.addChild("pc03", PLCPIDController( self, PLCUserMemory(710), 1000 ))
+        self.addChild("pc05", PLCPIDController( self, PLCUserMemory(750), 1000 ))
+        dpc01 = self.addChild("dpc01",PLCPIDController( self, PLCUserMemory(630), 1000 ))
+        dpc01.addOutput("mix",0)
+        dpc01.addSetpoint("recirc",0)
+        self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790), 1000 ))
 
         # General
         self.addChild("cpuUsage", PLCInt(self, 8434))
@@ -123,13 +125,14 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         labels = ["Msg1","IL01Fault","PB01toPause","PB01toRestart","PP01Stop","DPC01PIDHold","PC01PIDHold","PC05PIDHold","RC01PIDHold","FD100Pause","FD101Pause"]
         self.addChild("fault", PLCBitSet(self, [PLCUserMemory(923)], [labels]))
 
-        labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Fedd tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated"}
+        labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Feed tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated"}
         self.addChild("productionButtonFaultMsg", PLCEnum(self, PLCUserMemory(892), labels))
         self.addChild("cipButtonFaultMsg", PLCEnum(self, PLCUserMemory(893), labels))
         self.addChild("rinseFaultMsg", PLCEnum(self, PLCUserMemory(894), labels))
 
 
-        self.addChild("stepNum", PLCInt(self, 79))
+        labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling Feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
+        self.addChild("stepNum", PLCEnum(self, 79, labels))
 
         self.addChild("log1", PLCInt(self, 493))
         self.addChild("logtime", PLCLogTime(self))
