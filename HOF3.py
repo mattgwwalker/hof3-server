@@ -10,6 +10,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         PLCObject.__init__(self, self)
 
         # Analogue Inputs
+        self.addChild("lt01", PLCFixed( self, 21, 100 ))
         self.addChild("pt02", PLCFixed( self, 269, 1000 ))
         
         # Backflush valve
@@ -49,12 +50,18 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("pp03", PLCEnergisable( self, PLCUserMemory(620) ))
 
         # PID Controllers
-        self.addChild("pc01", PLCPIDController( self, PLCUserMemory(670), 1000 ))
+        pc01 = self.addChild("pc01", PLCPIDController( self, PLCUserMemory(670), 1000 ))
+        pc01.addSetpoint("membraneMaxInletPressure",9)
+        pc01.addOutput("drain",1)
+        
         self.addChild("pc03", PLCPIDController( self, PLCUserMemory(710), 1000 ))
+
         self.addChild("pc05", PLCPIDController( self, PLCUserMemory(750), 1000 ))
+
         dpc01 = self.addChild("dpc01",PLCPIDController( self, PLCUserMemory(630), 1000 ))
-        dpc01.addOutput("mix",0)
         dpc01.addSetpoint("recirc",0)
+        dpc01.addOutput("mix",0)
+
         self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790), 1000 ))
 
         # General
@@ -129,9 +136,10 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("productionButtonFaultMsg", PLCEnum(self, PLCUserMemory(892), labels))
         self.addChild("cipButtonFaultMsg", PLCEnum(self, PLCUserMemory(893), labels))
         self.addChild("rinseFaultMsg", PLCEnum(self, PLCUserMemory(894), labels))
+        self.addChild("resetFaultMsg", PLCEnum(self, PLCUserMemory(904), labels))
 
 
-        labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling Feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
+        labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
         self.addChild("stepNum", PLCEnum(self, 79, labels))
 
         self.addChild("log1", PLCInt(self, 493))

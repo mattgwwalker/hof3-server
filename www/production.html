@@ -46,17 +46,23 @@
   <li>Fill tank to 50%</li>
   <li>Start level: 40% (when the pump starts up and moves to mixing)</li>
   <li>Mix time: 1 minute</li>
-  <li>Pump speed during mixing: 15%</li>
+  <li>Pump speed during mixing: 15% of maximum inlet pressure</li>
+  <li>*** Get maximum inlet pressure and do calculation in bar for the user</li>
   <li>Recirc: 1 minute</li>
   <li>Along-membrane pressure during recirc: 0.8 bar</li>
   <li>Concentration (specified as membrane-use time which includes Recirc time): 5 minutes</li>
   <li>Empty to site (level before it moves to active draining): 30%</li>
-  <li>Active drain: level to 10%</li>
-  <li>Passive drain time: 1 minute</li>
+  <li>Active drain: level to 5%</li>
+  <li>Pump speed during active drain: 25%</li>
+  <li>Passive drain time: 90 seconds</li>
   <li>Need to manually acknowledge end</li>
+  <li>*** Check that the plant is awaiting a command</li>
+  <li>*** Check the valves are not in manual</li>
+  <li>*** Back flush frequency, direction change frequency etc, during production and during drain</li>
+  <li>*** Graph things like LT01</li>
 </ul>
 
-<h2>Fault Message:</h2>
+<h2>Selection Message:</h2>
 <div id="Production_FaultMessage">Waiting for plant status information</div>
 
 <button id="Production_StartBtn" data-theme="b">Start Production</button>
