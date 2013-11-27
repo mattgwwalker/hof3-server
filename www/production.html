@@ -22,7 +22,7 @@
 <div data-role="page" id="Production_Page">
 
 <div data-role="header" id="Production_Page-Header">
-  <h1>Basic Production</h1>
+  <h1>Advanced Production</h1>
 </div>
 
 <div data-role="popup" id="Production_Page-ErrorPopup" data-theme="e">
@@ -40,32 +40,193 @@
 
 <!-- End of boilerplate -->
 
-<h2>Basic production settings:</h2>
-<ul>
-  <li>Fill source: site</li>
-  <li>Fill tank to 50%</li>
-  <li>Start level: 40% (when the pump starts up and moves to mixing)</li>
-  <li>Mix time: 1 minute</li>
-  <li>Pump speed during mixing: 15% of maximum inlet pressure</li>
-  <li>*** Get maximum inlet pressure and do calculation in bar for the user</li>
-  <li>Recirc: 1 minute</li>
-  <li>Along-membrane pressure during recirc: 0.8 bar</li>
-  <li>Concentration (specified as membrane-use time which includes Recirc time): 5 minutes</li>
-  <li>Empty to site (level before it moves to active draining): 30%</li>
-  <li>Active drain: level to 5%</li>
-  <li>Pump speed during active drain: 25%</li>
-  <li>Passive drain time: 90 seconds</li>
-  <li>Need to manually acknowledge end</li>
-  <li>*** Check that the plant is awaiting a command</li>
-  <li>*** Check the valves are not in manual</li>
-  <li>*** Back flush frequency, direction change frequency etc, during production and during drain</li>
-  <li>*** Graph things like LT01</li>
-</ul>
+<h1>Advanced Run Settings</h1>
 
-<h2>Selection Message:</h2>
-<div id="Production_FaultMessage">Waiting for plant status information</div>
+<div id="Production_MainContainer">
+<h2>Filling</h2>
+
+  <p>The first stage of production is to fill the feed tank with
+  sufficient product to start mixing.  Filling may occur as needed
+  throughout the production process.</p>
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
+    <legend>Fill source:</legend>
+    <label><input type="radio" name="fillSource" value="site" checked="checked"/>
+      Site</label>
+    <label><input type="radio" name="fillSource" value="chemical"/>
+      Auto Chemical</label>
+    <label><input type="radio" name="fillSource" value="manualChemical"/>
+      Manual Chemical</label>
+    <label><input type="radio" name="fillSource" value="water"/>
+      Water</label>
+    <label><input type="radio" name="fillSource" value="none"/>
+      None</label>
+  </fieldset>
+
+  <label for="fillLevel">Fill level (%):</label>
+  <input name="fillLevel" id="fillLevel" data-highlight="true" min="0" max="100" value="50" type="range">
+
+  <label for="fillLevel">Fill level hysteresis (%):</label>
+  <input name="fillLevelHysteresis" id="fillLevelHysteresis" data-highlight="true" min="0" max="10" step="0.1" value="1" type="range">
+
+
+  <label for="startLevel">Start level (%, when the pump starts up and
+  moves to mixing):</label>
+  <input name="startLevel" data-highlight="true" min="0" max="100" value="50" type="range">
+
+  <label for="doseTime">Dose time (seconds):</label>
+  <input name="doseTime" id="doseTime" type="text">
+
+
+<h2>Mixing</h2>
+
+  <p>This stage is used to ensure that contents of the feed tank are
+  well mixed, and to start filling the plant's pipework.</p>
+
+  <p>If the following time is set to a negative value (such as -1),
+  then the PLC will stay in this state indefinitely.</p>
+
+  <label for="mixTime">Mix time:</label>
+  <input name="mixTime" id="mixTime" type="text">
+
+  <label for="mixPressure">Target pressure during mixing
+  (specified as a percentage of the membrane's maximum inlet
+  pressure, <span id="membraneMaxInletPressure">___</span> bar, even
+  though the membrane is not in use during mixing; measured at PT01;
+  equivalent to specifying a target pressure
+  of <span id="mixPressureInBar">___</span> bar):</label>
+  <input name="mixPressure" data-highlight="true" min="0" max="100" value="25" type="range">
+
+
+<h2>Production</h2>
+
+  <p>These values are used during both the Recirculating and
+  Concentrating states.</p>
+
+  <label for="membraneUseTime">Membrane-use time (the total
+  recirculating and concentrating time before the plant stops
+  itself):</label>
+  <input name="membraneUseTime" id="membraneUseTime" type="text">
+
+  <label for="alongMembranePressure">Along-membrane pressure drop target (bar):</label>
+  <input name="alongMembranePressure" id="alongMembranePressure" type="text">
+
+  <label for="transMembranePressure">Trans-membrane pressure drop target (bar):</label>
+  <input name="transMembranePressure" id="transMembranePressure" type="text">
+
+  <label for="backwashPressure">Backwash pressure target (bar):</label>
+  <input name="backwashPressure" id="backwashPressure" type="text">
+
+  <label for="backwashControllerStart">Backwash PID controller's starting position (%):</label>
+  <input name="backwashControllerStart" id="backwashControllerStart" data-highlight="true" min="0" max="100" value="25" type="range">
+
+  <label for="backwashFreq">Backwash frequency (seconds between backwashes; a negative value will disable backwashes):</label>
+  <input name="backwashFreq" id="backwashFreq" type="text">
+
+  <label for="directionChangeFreq">Direction change frequency (seconds between direction changes):</label>
+  <input name="directionChangeFreq" id="directionChangeFreq" type="text">
+
+  <p>There are also variables that specify the timings involved in a
+  backwash and a direction change.  Specifically, these are the delay
+  times of IV05, IV06, and DV0{1,2,3}, plus the duration of two states
+  found in FD101.  These should not need to be modified from their
+  factory default settings, even for an advanced production run.</p>
+
+<h2>Recirculating</h2>
+
+  <p>This stage fills all the plant's pipework with product by sending
+  the product through the membrane but directing both the permeate and
+  the retentate lines back to the feed tank.</p>
+
+  <p>If the following time is set to a negative value (such as -1),
+  then the PLC will stay in this state indefinitely.</p>
+
+  <label for="recicTime">Recirculating time:</label>
+  <input name="recircTime" id="recircTime" type="text">
+
+
+<h2>Concentrating</h2>
+
+  <p>While concentrating, the permeate is discharged to site and the
+  retentate is recirculated until the desired concentration ratio is
+  reached, after which the retentate too is discharged to site.</p>
+
+  <p>The concentration duration is specified indirectly via the amount
+  of membrane-use time (see Production, above).</p>
+
+  <p>The concentration ratio is the proportion of solids in the
+  retentate compared to the initial product's solids content.  For
+  example, a concentration ratio of 3 would provide retentate that had
+  a solids' propotion three times greater than that of the
+  in-feed.</p>
+
+  <p>The <i>k</i>-factor specifies the proportion of solids that
+  permeates the membrane.  This feature is currently not implemented.
+  It is currently assumed to be zero, meaning that no solids pass
+  through the membrane.</p>
+
+  <label for="concRatio">Concentration ratio:</label>
+  <input name="concRatio" id="concRatio" type="text">
+
+
+<h2>Emptying to site</h2>
+
+<p>Once the membrane-use time is up, the plant runs down the feed tank
+by sending permeate and rentate off to site.</p>
+
+  <label for="emptyLevel">Empty level (%):</label>
+  <input name="emptyLevel" id="emptyLevel" data-highlight="true" min="0" max="100" value="30" type="range">
+
+
+<h2>Draining</h2>
+
+<p>This value applies to both the Pump to drain state and the Passive drain state.</p>
+
+  <label for="drainDirectionChangeFreq">Direction change frequency
+  during draining (seconds between direction changes):</label>
+  <input name="drainDirectionChangeFreq" id="drainDirectionChangeFreq" type="text">
+
+
+<h2>Pump to drain</h2>
+
+<p>Once the feed tank has been lowered to its empty level, the
+remaining plant contents are pumped to drain.</p>
+
+  <label for="drainLevel">Drain level (%):</label>
+  <input name="drainLevel" id="drainLevel" data-highlight="true" min="0" max="100" value="5" type="range">
+
+  <label for="drainPumpSpeed">Pump speed to drain (%):</label>
+  <input name="drainPumpSpeed" id="drainPumpSpeed" data-highlight="true" min="0" max="100" value="25" type="range">
+
+<h2>Passive drain</h2>
+
+<p>In this stage, the remaining plant contents can no longer be
+pumped.  The valves are left open and the membrane direction valves
+change, in order to let the plant drain completely.</p>
+
+  <label for="drainTime">Drain time:</label>
+  <input name="drainTime" id="drainTime" type="text">
+  
+
+
+<h1>Messages:</h1>
+<div id="Production_Message">Waiting for plant status information</div>
+
 
 <button id="Production_StartBtn" data-theme="b">Start Production</button>
+
+
+
+<h1>TODO</h1>
+<ul>
+  <li>Need to manually acknowledge end.  Fix this with a command scheduler.</li>
+  <li>Check the values of the inputs before attempting to send them.
+  Also, the server errors where is should just return false when no
+  value or an invalid value is specified.</li>
+</ul>
+
+</div> <!-- End of 'Production_MainContainer' -->
+
 
 <!-- Start of terminating boilerplate -->
 

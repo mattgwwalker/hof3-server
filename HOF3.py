@@ -12,11 +12,14 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         # Analogue Inputs
         self.addChild("lt01", PLCFixed( self, 21, 100 ))
         self.addChild("pt02", PLCFixed( self, 269, 1000 ))
+        self.addChild("ft01", PLCFixed( self, 9, 100 ))
+        self.addChild("ft02", PLCFixed( self, 11, 100 ))
+        self.addChild("ft03", PLCFixed( self, 13, 100 ))
         
         # Backflush valve
         self.addChild("bf01", PLCEnergisable( self, PLCUserMemory(370) ))
 
-        # ??? What are these
+        # Cooling plants
         self.addChild("cp01", PLCEnergisable( self, PLCUserMemory(380) ))
         self.addChild("cp02", PLCEnergisable( self, PLCUserMemory(390) ))
 
@@ -54,15 +57,20 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         pc01.addSetpoint("membraneMaxInletPressure",9)
         pc01.addOutput("drain",1)
         
-        self.addChild("pc03", PLCPIDController( self, PLCUserMemory(710), 1000 ))
+        pc03 = self.addChild("pc03", PLCPIDController( self, PLCUserMemory(710), 1000 ))
+        pc03.addSetpoint("prod",0)
+        pc03.addOutput("start",0)
 
-        self.addChild("pc05", PLCPIDController( self, PLCUserMemory(750), 1000 ))
+        pc05 = self.addChild("pc05", PLCPIDController( self, PLCUserMemory(750), 1000 ))
+        pc05.addSetpoint("prod",0)
+        pc03.addOutput("start",0)
 
         dpc01 = self.addChild("dpc01",PLCPIDController( self, PLCUserMemory(630), 1000 ))
         dpc01.addSetpoint("recirc",0)
         dpc01.addOutput("mix",0)
 
-        self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790), 1000 ))
+        rc01 = self.addChild("rc01", PLCPIDController( self, PLCUserMemory(790), 1000 ))
+        rc01.addSetpoint("prod",0)
 
         # General
         self.addChild("cpuUsage", PLCInt(self, 8434))
@@ -84,6 +92,10 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         # 5: as above, immediately
         # 7: pause
         # 9: abort
+
+        labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
+        self.addChild("stepNum", PLCEnum(self, 79, labels))
+
 
         labels = ["Unknown","Product Full","Product Empty","Rinse Full","Rinse Empty","CIP Full","CIP Empty"]
         self.addChild("plantStatus", PLCEnum( self, PLCUserMemory(925), labels ))
@@ -114,7 +126,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("backwashTopTimeSP", PLCTimer( self, PLCUserMemory(938) ))
         self.addChild("backwashBottomTimeSP", PLCTimer( self, PLCUserMemory(940) ))
 
-        self.addChild("drainRouteTimeSP", PLCTimer( self, PLCUserMemory(942) )) # During drain, time between top route and bottom route
+        self.addChild("drainDirectionChangeTimeSP", PLCTimer( self, PLCUserMemory(942) )) # During drain, time between top route and bottom route
 
         self.addChild("backwashTimeSP", PLCTimer( self, PLCUserMemory(946) )) # -1 to disable.
         self.addChild("directionChangeTimeSP", PLCTimer( self, PLCUserMemory(950) )) 
@@ -133,14 +145,11 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("fault", PLCBitSet(self, [PLCUserMemory(923)], [labels]))
 
         labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Feed tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated"}
-        self.addChild("productionButtonFaultMsg", PLCEnum(self, PLCUserMemory(892), labels))
-        self.addChild("cipButtonFaultMsg", PLCEnum(self, PLCUserMemory(893), labels))
-        self.addChild("rinseFaultMsg", PLCEnum(self, PLCUserMemory(894), labels))
-        self.addChild("resetFaultMsg", PLCEnum(self, PLCUserMemory(904), labels))
+        self.addChild("productionSelectionMsg", PLCEnum(self, PLCUserMemory(892), labels))
+        self.addChild("cipSelectionMsg", PLCEnum(self, PLCUserMemory(893), labels))
+        self.addChild("rinseSelectionMsg", PLCEnum(self, PLCUserMemory(894), labels))
+        self.addChild("faultMsg", PLCEnum(self, PLCUserMemory(904), labels))
 
-
-        labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
-        self.addChild("stepNum", PLCEnum(self, 79, labels))
 
         self.addChild("log1", PLCInt(self, 493))
         self.addChild("logtime", PLCLogTime(self))
@@ -148,3 +157,10 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("logWritePtr", PLCInt(self, 489))
 
         self.addChild("pc03Counter", PLCInt(self, PLCUserMemory(953)))
+
+        self.addChild("checkAuto", PLCEnum(self, PLCUserMemory(99), {1:"All in auto", 0:"Not all in auto"}))
+
+        self.addChild("concRatio", PLCFixed(self, 93, 1000))
+
+        self.addChild("ft03OverMaxFlowTimer", PLCTimer(self, PLCUserMemory(846)))
+        self.addChild("ft02OverMaxFlowTimer", PLCTimer(self, PLCUserMemory(848)))

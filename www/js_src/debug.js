@@ -2,7 +2,7 @@
 var eventSource;
 
 function openEventSource() {
-    var address = "/events?obj=hof3.stepNum,hof3.fillSource,hof3.fillLevel,hof3.plantStatus,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP,hof3.productionButtonFaultMsg,hof3.cipButtonFaultMsg,hof3.resetFaultMsg";
+    var address = "/events?obj=hof3.checkAuto,hof3.stepNum,hof3.fillSource,hof3.productionSelectionMsg,hof3.cipSelectionMsg,hof3.rinseSelectionMsg,hof3.faultMsg,hof3.fillLevel,hof3.plantStatus,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP";
     console.log("Creating EventSource from "+address);
     return new EventSource(address);
 }
@@ -10,13 +10,15 @@ function openEventSource() {
 
 function onEventSourceMessage(event) {
     var data = JSON.parse(event.data);
+    $("#Debug_AutomaticState").html(data.hof3.checkAuto);
 
     $("#Debug_State").html(data.hof3.stepNum);
     $("#Debug_Contents").html(data.hof3.plantStatus);
 
-    $("#Debug_ProductionFaultMessage").html(data.hof3.productionButtonFaultMsg);
-    $("#Debug_CIPFaultMessage").html(data.hof3.cipButtonFaultMsg);
-    $("#Debug_FaultMessage").html(data.hof3.resetFaultMsg);
+    $("#Debug_ProductionSelectionMessage").html(data.hof3.productionSelectionMsg);
+    $("#Debug_CIPSelectionMessage").html(data.hof3.cipSelectionMsg);
+    $("#Debug_RinseSelectionMessage").html(data.hof3.rinseSelectionMsg);
+    $("#Debug_FaultMessage").html(data.hof3.faultMsg);
 
     $("#Debug_FillSource").html(data.hof3.fillSource);
     $("#Debug_FillLevel").html(data.hof3.fillLevel+"%");
@@ -57,9 +59,63 @@ function onEventSourceMessage(event) {
 
 }
 
+
+function onEventSourceError(event) {
+    showError("Error","An error has occurrred with the EventSource.  Data on this page is no longer updated automatically.  Refresh the page.");
+}
+
+
 function startEventSource() {
     eventSource = openEventSource();
     eventSource.onmessage = onEventSourceMessage;
+    eventSource.onerror = onEventSourceError;
+}
+
+
+function resetToAutomatic() {
+    $.ajax( {
+        url: "write",
+        type: "GET",
+        data: { "hof3.bf01" : "auto",
+                "hof3.cp01" : "auto",
+                "hof3.cp02" : "auto",
+                "hof3.dv01" : "auto",
+                "hof3.dv02" : "auto",
+                "hof3.dv03" : "auto",
+                "hof3.dv04" : "auto",
+                "hof3.dv05" : "auto",
+                "hof3.dv06" : "auto",
+                "hof3.dv07" : "auto",
+                "hof3.dv08" : "auto",
+                "hof3.el01" : "auto",
+                "hof3.iv01" : "auto",
+                "hof3.iv02" : "auto",
+                "hof3.iv03" : "auto",
+                "hof3.iv04" : "auto",
+                "hof3.iv05" : "auto",
+                "hof3.iv06" : "auto",
+                "hof3.iv07" : "auto",
+                "hof3.iv08" : "auto",
+                "hof3.iv09" : "auto",
+                "hof3.iv10" : "auto",
+                "hof3.iv15" : "auto",
+                "hof3.iv16" : "auto",
+                "hof3.pp01" : "auto",
+                "hof3.pp02" : "auto",
+                "hof3.pp03" : "auto",
+                "hof3.dpc01" : "auto",
+                "hof3.pc01" : "auto",
+                "hof3.pc03" : "auto",
+                "hof3.pc05" : "auto",
+                "hof3.rc01" : "auto",
+              }
+        })
+        .done( function(data) {
+            alert("Reset all items to automatic");
+        })
+        .fail( function(data) {
+            showError("Error","Failed to send instructions to reset all items to automatic.  Are you still connected to HOF3?");
+        });
 }
 
 
@@ -126,6 +182,7 @@ function onClickAbortBtn() {
 
 // Page initialisation event
 $(document).on( "pageinit", "#Debug_Page", function(event) {
+    $("#Debug_ResetToAutoBtn").click(resetToAutomatic);
     $("#Debug_AcknowledgeBtn").click(onClickAcknowledgeBtn);
     $("#Debug_PauseBtn").click(onClickPauseBtn);
     $("#Debug_StopBtn").click(onClickStopBtn);

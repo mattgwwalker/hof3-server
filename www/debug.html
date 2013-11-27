@@ -40,6 +40,14 @@
 
 <!-- End of boilerplate -->
 
+<h2>Automatic</h2>
+
+<ul>
+  <li>State: <span id="Debug_AutomaticState"></span></li>
+</ul>
+<button id="Debug_ResetToAutoBtn" data-theme="b">Reset all items to automatic</button>
+
+
 <h2>Current plant status</h2>
 <ul>
   <li>State: <span id="Debug_State"></span></li>
@@ -54,8 +62,9 @@
 
 <h2>Messages</h2>
 <ul>
-  <li>Production: <span id="Debug_ProductionFaultMessage"></span></li>
-  <li>CIP: <span id="Debug_CIPFaultMessage"></span></li>
+  <li>Production: <span id="Debug_ProductionSelectionMessage"></span></li>
+  <li>CIP: <span id="Debug_CIPSelectionMessage"></span></li>
+  <li>Rinse: <span id="Debug_RinseSelectionMessage"></span></li>
   <li>Fault: <span id="Debug_FaultMessage"></span></li>
 </ul>
 
@@ -68,6 +77,7 @@
   <li>Start level (start level + hysteresis is when the pump starts up and moves to mixing): <span id="Debug_StartLevel"></span></li>
 </ul>
 
+
 <h2>Mixing</h2>
 <ul>
   <li>Mix time: <span id="Debug_MixTime"></span></li>
@@ -75,6 +85,7 @@
   <li>Pump speed during mixing: <span id="Debug_MixPumpSpeed"></span></li>
   <li>Maximum inlet pressure for membrane: <span id="Debug_MembraneMaxInletPressure"></span></li>
 </ul>
+
 
 <h2>Recirculating</h2>
 <ul>
@@ -84,6 +95,7 @@
   <li>Membrane-use timer: <span id="Debug_MembraneUseTimer"></span></li>
 </ul>
 
+
 <h3>Direction Changes</h3>
 <ul>
   <li>Direction-change frequency: <span id="Debug_DirectionChangeTime"></span></li>
@@ -92,6 +104,7 @@
   <li>Direction-change duration (when direction is going to the bottom, must be at least the duration of iv05 and iv06's delay times): <span id="Debug_DirectionChangeBottomTime"></span></li>
   <li>Direction-change duration timer: <span id="Debug_DirectionChangeDurationTimer"></span></li>  
 </ul>
+
   
 <h3>Backwashes</h3>
 <ul>
@@ -102,6 +115,7 @@
   <li>Backwash duration timer: <span id="Debug_BackwashTimer"></span></li>
 </ul>
 
+
 <h2>Concentrating</h2>
 <ul>
   <li>Concentration (specified as membrane-use time which includes Recirc time): <span id="Debug_ConcentrationTime"></span></li>
@@ -109,10 +123,12 @@
   <li>Pump pressure is as per Recirculating pressure</li>
 </ul>
 
+
 <h2>Emptying</h2>
 <ul>
   <li>Empty to site (level before it moves to active draining): <span id="Debug_EndLevel"></span></li>
 </ul>
+
 
 <h2>Draining</h2>
 <ul>
