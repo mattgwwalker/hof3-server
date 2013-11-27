@@ -2,7 +2,7 @@
 
 <body>
 
-<p>Things to fix:</p>
+<h2>Things to fix with PLC code:</h2>
 <ul>
   <li>During Mixing, DV03 is currently in the wrong direction.  The
   problem is that liquid can pass through the membrane and out the
@@ -13,8 +13,32 @@
 
   <li>The pause command does not pause the filling of product.</li>
 
-  <li>The direction change timers do not reset to zero.</li>
+  <li>The direction change timers do not reset to zero.  Should they?
+  Is it better that we do not and rather keep a consistent duration
+  between direction changes?</li>
+
+  <li>There is currently no provision for the user to fill the tank on
+  their own.  What would happen if we set fillSource to none and
+  started production?</li>
+
+  <li>When a fault occurs, the PIDs might be frozen, but the timers
+  don't seem to be.  It moved states while faulting after ~30
+  seconds.</li>
+
+  <li>When the process is aborted, the concentration ratio reverts to
+  one.  This isn't necessary.  Fix it.</li>
+
+  <li>The PID controller for PC03 jumps out of manual setpoint all on
+  its own.  Fix this.</li>
+
+  <li>If dosing is longer than mixing+recirc, then dosing is cut
+  short.</li>
+
+  <li>Change dosing to be measured as a percentage of full tank.
+  Dosing pump gives an average 3.82mL/s at 90% on pump's dial.</li>
+
 </ul>
+
 
 </body>
 
