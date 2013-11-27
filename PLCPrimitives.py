@@ -248,7 +248,11 @@ class PLCEnum(PLCInt):
         """Gets the enum's value as a string."""
         d = PLCInt.get(self)
         def onResult(data):
-            return self._values[data]
+            try:
+                return self._values[data]
+            except (KeyError, IndexError):
+                # We don't know this value's meaning, so just return the number
+                return data
         d.addCallback(onResult)
         return d
     
@@ -297,7 +301,7 @@ class PLCTimer(PLCPrimitive):
         d = defer.gatherResults( [d1,d2] )
         def onResult(data):
             mins, secs = data
-            return int(mins)*60 + int(secs)
+            return int(mins)*60 + float(secs)
         d.addCallback( onResult )
         return d
 
