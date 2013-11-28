@@ -82,7 +82,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
                       PLCEnum(self, 
                               PLCUserMemory(890),
                               #{0:"none",1:"ack_end",2:"pushbutton",3:"stop",4:"recirc",5:"pause",6:"abort"}))
-                              ["none","ack_end","pushbutton","stop","recirc","pause","abort"])) #FIXME: Should use a dictionary
+                              ["none","ack_end","pushbutton","stop","recirc","pause","abort","drain","store"])) #FIXME: Should use a dictionary
         # This is more of an enum type... 
         # 0: None, 
         # 1: Acknowledge the end of a process (e.g. production has ended)
@@ -100,7 +100,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         labels = ["Unknown","Product Full","Product Empty","Rinse Full","Rinse Empty","CIP Full","CIP Empty"]
         self.addChild("plantStatus", PLCEnum( self, PLCUserMemory(925), labels ))
 
-        labels = ["none","site","water","chemical","manualChemical"]
+        labels = ["none","site","water","chemical","manualChemical","storageTank"]
         self.addChild("fillSource", PLCEnum( self, PLCUserMemory(924), labels ))
         self.addChild("fillLevel", PLCFixed( self, PLCUserMemory(210), 100 ))
         self.addChild("fillLevelHysteresis", PLCFixed( self, PLCUserMemory(211), 100 )) # Advanced. Delta as percentage point of fill level.  Starts filling at fillLevel - hysteresis; stops filling at fillLevel + hysteresis.  Setting this too low may produce multi-dosed chemicals.
@@ -144,7 +144,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         labels = ["Msg1","IL01Fault","PB01toPause","PB01toRestart","PP01Stop","DPC01PIDHold","PC01PIDHold","PC05PIDHold","RC01PIDHold","FD100Pause","FD101Pause"]
         self.addChild("fault", PLCBitSet(self, [PLCUserMemory(923)], [labels]))
 
-        labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Feed tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated"}
+        labels = {0:"Everything's fine", 1:"Main pump fault", 2:"Pause pushbutton activated", 3:"E-Stop activated", 4:"No water pressure", 5:"No high-pressure air", 6:"No low-pressure air", 7:"No seal water on main pump", 8:"Feed tank full of product", 9:"Feed tank empty of product", 10:"Feed tank full of rinse water", 11:"Feed tank empty of rinse water", 12:"Feed tank full of CIP chemical", 13:"Feed tank empty of CIP chemical", 14:"Pause selection activated", 15:"Maximum time expired for feed tank fill"}
         self.addChild("productionSelectionMsg", PLCEnum(self, PLCUserMemory(892), labels))
         self.addChild("cipSelectionMsg", PLCEnum(self, PLCUserMemory(893), labels))
         self.addChild("rinseSelectionMsg", PLCEnum(self, PLCUserMemory(894), labels))
@@ -164,3 +164,5 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
 
         self.addChild("ft03OverMaxFlowTimer", PLCTimer(self, PLCUserMemory(846)))
         self.addChild("ft02OverMaxFlowTimer", PLCTimer(self, PLCUserMemory(848)))
+
+        self.addChild("fillLevelMaxTimeWithoutIncrease", PLCTimer(self, PLCUserMemory(926)))
