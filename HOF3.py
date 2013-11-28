@@ -82,16 +82,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
                       PLCEnum(self, 
                               PLCUserMemory(890),
                               #{0:"none",1:"ack_end",2:"pushbutton",3:"stop",4:"recirc",5:"pause",6:"abort"}))
-                              ["none","ack_end","pushbutton","stop","recirc","pause","abort","drain","store"])) #FIXME: Should use a dictionary
-        # This is more of an enum type... 
-        # 0: None, 
-        # 1: Acknowledge the end of a process (e.g. production has ended)
-        # 2: Stop with pushbutton acknowledgement, 
-        # 3: Stop immediately
-        # 4: Production with retentate bleed and permeate out, with bushbutton acklnowledgement
-        # 5: as above, immediately
-        # 7: pause
-        # 9: abort
+                              ["none","ack_end","pushbutton","stop","recirc","pause","abort","drain","store"]))
 
         labels = ["Reset","Awaiting command","Press the green button to start","Waiting","Filling feedtank","Mixing","Recirculating","Concentrating","Emptying to site","Pumping to drain","Draining"]
         self.addChild("stepNum", PLCEnum(self, 79, labels))
