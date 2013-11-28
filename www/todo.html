@@ -4,6 +4,26 @@
 
 <h2>Things to fix with PLC code:</h2>
 <ul>
+  <li>The PID controller for PC03 jumps out of manual setpoint all on
+  its own.  Fix this.</li>
+
+  <li>Add drain-to-tank command</li>
+ 
+  <li>Move draining to a separate command.  Leave emptying to site as
+  a part of production, but add the ability to skip it (-1 in empty
+  level, for example).</li>
+ 
+  <li>Add PID controllers for heating and cooling (user chooses).</li>
+
+  <li>If dosing is longer than mixing+recirc, then dosing is cut
+  short.</li>
+
+  <li>Change dosing to be measured as a chemical concentration
+  (percentage of tank).  Dosing pump gives an average 3.82mL/s at 90%
+  on pump's dial.</li>
+
+  <li>Add fault checking for pressures and pH.</li>
+
   <li>During Mixing, DV03 is currently in the wrong direction.  The
   problem is that liquid can pass through the membrane and out the
   permeate line.  The solution is to close off DV03 during Mixing.  It
@@ -28,14 +48,11 @@
   <li>When the process is aborted, the concentration ratio reverts to
   one.  This isn't necessary.  Fix it.</li>
 
-  <li>The PID controller for PC03 jumps out of manual setpoint all on
-  its own.  Fix this.</li>
+  <li>Add backflush-return states so that piston can return to normal
+  position while PID controllers are still frozen.</li>
 
-  <li>If dosing is longer than mixing+recirc, then dosing is cut
-  short.</li>
-
-  <li>Change dosing to be measured as a percentage of full tank.
-  Dosing pump gives an average 3.82mL/s at 90% on pump's dial.</li>
+  <li>Add storage tank status.  When filling from storage tank use
+  this value as the new plant status.</li>
 
 </ul>
 
