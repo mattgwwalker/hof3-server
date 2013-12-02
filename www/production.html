@@ -80,6 +80,31 @@
   <input name="doseTime" id="doseTime" type="text">
 
 
+<h2>Temperature Control</h2>
+
+  <p>The feed tank's temperature may be controlled via either heating
+  or cooling.  Temperature is first achieved while mixing.  Once
+  achieved it is maintained throughout production.  Heating is enabled
+  above fill levels of 40%.  If the level drops below 35% heating will
+  be disabled.</p>
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
+    <legend>Method:</legend>
+    <label><input type="radio" name="tempControl" value="No control" checked="checked"/>
+      No control</label>
+    <label><input type="radio" name="tempControl" value="Heating"/>
+      Heating</label>
+    <label><input type="radio" name="tempControl" value="Cooling"/>
+      Cooling</label>
+  </fieldset>
+
+
+  <label for="desiredTemp">Desired temperature (&deg;C) (FIXME: Get maximum from lowest of max temp of machine and of membrane and of product):</label>
+  <input name="desiredTemp" id="desiredTemp" data-highlight="true" min="0" max="100" value="20" type="range">
+
+  <label for="desiredTempHysteresis">Desired temperature hysteresis (&deg;C):</label>
+  <input name="desiredTempHysteresis" id="desiredTempHysteresis" data-highlight="true" min="0" max="10" step="0.1" value="1" type="range">
+
 <h2>Mixing</h2>
 
   <p>This stage is used to ensure that contents of the feed tank are
@@ -180,38 +205,58 @@ by sending permeate and rentate off to site.</p>
   <input name="emptyLevel" id="emptyLevel" data-highlight="true" min="0" max="100" value="30" type="range">
 
 
-<h2>Draining</h2>
+<h2>Fault Conditions</h2>
 
-<p>This value applies to both the Pump to drain state and the Passive drain state.</p>
+<p>Once started, exceeding the following conditions places the plant into fault.</p>
 
-  <label for="drainDirectionChangeFreq">Direction change frequency
-  during draining (seconds between direction changes):</label>
-  <input name="drainDirectionChangeFreq" id="drainDirectionChangeFreq" type="text">
+  <label for="faultMaxInletPressure">Maximum inlet pressure (PT01) (bar):</label>
+  <input name="faultMaxInletPressure" id="faultMaxInletPressure" type="text">
 
-
-<h2>Pump to drain</h2>
-
-<p>Once the feed tank has been lowered to its empty level, the
-remaining plant contents are pumped to drain.</p>
-
-  <label for="drainLevel">Drain level (%):</label>
-  <input name="drainLevel" id="drainLevel" data-highlight="true" min="0" max="100" value="5" type="range">
-
-  <label for="drainPumpSpeed">Pump speed to drain (%):</label>
-  <input name="drainPumpSpeed" id="drainPumpSpeed" data-highlight="true" min="0" max="100" value="25" type="range">
-
-<h2>Passive drain</h2>
-
-<p>In this stage, the remaining plant contents can no longer be
-pumped.  The valves are left open and the membrane direction valves
-change, in order to let the plant drain completely.</p>
-
-  <label for="drainTime">Drain time:</label>
-  <input name="drainTime" id="drainTime" type="text">
+  <label for="faultMaxTransMembranePressure">Maximum transmembrane pressure (bar):</label>
+  <input name="faultMaxTransMembranePressure" id="faultMaxTransMembranePressure" type="text">
   
+  <label for="faultMaxAlongMembranePressure">Maximum along-membrane pressure (bar):</label>
+  <input name="faultMaxAlongMembranePressure" id="faultMaxAlongMembranePressure" type="text">
+
+  <label for="faultMaxBackPressure">Maximum back pressure (bar):</label>
+  <input name="faultMaxBackPressure" id="faultMaxBackPressure" type="text">
+
+  <label for="faultMinTemp">Minimum temperature (&deg;C):</label>
+  <input name="faultMinTemp" id="faultMinTemp" type="text">
+
+  <label for="faultMaxTemp">Maximum temperature (&deg;C):</label>
+  <input name="faultMaxTemp" id="faultMaxTemp" type="text">
+
+  <label for="faultMinPH">Minimum pH:</label>
+  <input name="faultMinPH" id="faultMinPH" type="text">
+
+  <label for="faultMaxPH">Maximum pH:</label>
+  <input name="faultMaxPH" id="faultMaxPH" type="text">
 
 
-<h1>Messages:</h1>
+<h2>Logging</h2>
+
+<p>The PLC logs data for a number of events (such as the start of
+mixing, and the occurance of a backwash).  It can also log highly
+detailed data during backwashing to allow analysis of the backwash
+device.  It is also possible for the PLC to log data at regular
+intervals.  Set this value to a negative number to disable timer-based
+logging. </p>
+
+  <label for="logFreq">Log frequency (seconds):</label>
+  <input name="logFreq" id="logFreq" type="text">
+
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
+    <legend>Detailed backwash logging:</legend>
+    <label><input type="radio" name="logBackwashDetail" value="0" checked="checked"/>
+      Disabled</label>
+    <label><input type="radio" name="logBackwashDetail" value="1"/>
+      Enabled</label>
+  </fieldset>
+
+
+<h1>Messages</h1>
 <div id="Production_Message">Waiting for plant status information</div>
 
 

@@ -263,3 +263,99 @@ class PLCPIDController(PLCObject):
     def addOutput(self, name, index):
         # Scale factor is 100 as output is a percentage
         self.outputs.addChild(name, PLCFixed(self.plc, self.addressOutputs[index], 100))
+
+
+class PLCLog(PLCObject):
+    def __init__(self, plc):
+        PLCObject.__init__(self, plc)
+        startAddress = 493
+        self.eventLogAddress = startAddress + 0
+        self.pt01LogAddress = startAddress + 2
+        self.pt02LogAddress = startAddress + 4
+        self.pt03LogAddress = startAddress + 6
+        self.pt04LogAddress = startAddress + 8
+        self.ft01LogAddress = startAddress + 10
+        self.ft02LogAddress = startAddress + 12
+        self.ft03LogAddress = startAddress + 14
+        self.tt01LogAddress = startAddress + 16
+        self.lt01LogAddress = startAddress + 18
+        self.ph01LogAddress = startAddress + 20
+        self.r01LogAddress  = startAddress + 22
+        self.maxBackwashPressureLogAddress  = startAddress + 24
+
+        eventLabels = {0:"None",
+                       -1:"On timer",
+                       1:"Started",
+                       2:"Finished",
+                       3:"Stopped",
+                       4:"Aborted",
+                       10:"Filling started",
+                       11:"Mixing started",
+                       12:"Recirculating started",
+                       13:"Concentrating started",
+                       14:"Emptying to site started",
+                       15:"Pumping to drain started",
+                       16:"Passive draining started",
+                       17:"Pumping to store started",
+                       18:"Passive draining to store started",
+                       20:"Backwash started",
+                       21:"Direction change started",
+                       22:"Maximum backwash pressure",
+                       100:"During backwash",
+                       101:"During backwash retract",
+                       102:"During freeze of PIDs",
+
+                       10001:"Main pump fault", 
+                       10002:"Pause pushbutton activated", 
+                       10003:"E-Stop activated", 
+                       10004:"No water pressure", 
+                       10005:"No high-pressure air", 
+                       10006:"No low-pressure air", 
+                       10007:"No seal water on main pump", 
+                       10014:"Pause selection activated", 
+                       10015:"Maximum time expired for feed tank fill",
+                       10016:"Feed tank temperature too low", 
+                       10017:"Feed tank temperature too high", 
+                       10018:"Inlet pressure too high", 
+                       10019:"Trans-membrane pressure too high", 
+                       10020:"Backwash pressure too high", 
+                       10021:"Along-membrane pressure too high", 
+                       10022:"Feed tank pH too low", 
+                       10023:"Feed tank pH too high"}
+
+        
+
+
+        self.addChild( "datetime", PLCTime(plc, 8446, 8445, 8444, 8447, 8448, 8449, 8450) )
+        self.addChild( "event", PLCEnum(plc, self.eventLogAddress, eventLabels) )
+        self.addChild( "pt01", PLCFixed(plc, self.pt01LogAddress, 1000) )
+        self.addChild( "pt02", PLCFixed(plc, self.pt02LogAddress, 1000) )
+        self.addChild( "pt03", PLCFixed(plc, self.pt03LogAddress, 1000) )
+        self.addChild( "pt04", PLCFixed(plc, self.pt04LogAddress, 1000) )
+        self.addChild( "ft01", PLCFixed(plc, self.ft01LogAddress, 100) )
+        self.addChild( "ft02", PLCFixed(plc, self.ft02LogAddress, 100) )
+        self.addChild( "ft03", PLCFixed(plc, self.ft03LogAddress, 100) )
+        self.addChild( "tt01", PLCFixed(plc, self.tt01LogAddress, 100) )
+        self.addChild( "lt01", PLCFixed(plc, self.lt01LogAddress, 100) )
+        self.addChild( "ph01", PLCFixed(plc, self.ph01LogAddress, 100) )
+        self.addChild( "r01",  PLCFixed(plc, self.r01LogAddress,  1000) )
+        self.addChild( "maxBackwashPressure",PLCFixed(plc, self.maxBackwashPressureLogAddress, 1000))
+
+        self.readPtr = self.addChild( "readPtr", PLCInt(plc, 491))
+        self.writePtr = self.addChild( "writePtr", PLCInt(plc, 489))
+
+    def get(self):
+        d = PLCObject.get(self)
+        def onResult(data):
+            if (data["writePtr"] == 0 
+                or data["readPtr"] == data["writePtr"]):
+                # Do not increment read pointer
+                pass
+            else:
+                # Increment read pointer
+                self.readPtr.set( data["readPtr"]+1 )
+            return data
+        d.addCallback(onResult)
+        return d
+        
+

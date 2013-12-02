@@ -177,12 +177,14 @@ function onChangeController() {
             if (data.status.modeMan) {
                 // We're in manual
                 if (data.status.modePID) {
+                    alert("In manual, in pid");
                     // We're in manual PID mode
                     $("#ConfigurePID_ManualPIDBtn").attr("checked",true).checkboxradio("refresh");
                     $("#ConfigurePID_ContainerNewSetPoint").show();
                     $("#ConfigurePID_ContainerNewRampTarget").hide();
                     $("#ConfigurePID_ContainerNewOutput").hide();
                 } else {
+                    alert("In manual, in setoutput");
                     // We're in manual setpoint mode FIXME:ramping?
                     $("#ConfigurePID_ManualOutputBtn").attr("checked",true).checkboxradio("refresh");
                     $("#ConfigurePID_ContainerNewSetPoint").hide();
@@ -191,6 +193,7 @@ function onChangeController() {
                 }
             } else {
                 // We're in automatic
+                alert("in auto");
                 $("#ConfigurePID_AutomaticBtn").attr("checked",true).checkboxradio("refresh");
                 $("#ConfigurePID_ContainerNewSetPoint").hide();
                 $("#ConfigurePID_ContainerNewRampTarget").hide();
@@ -432,6 +435,16 @@ function onClickManualPIDBtn() {
     $("#ConfigurePID_ContainerNewOutput").hide();
 
     writeCommand("manual");
+    
+function pausecomp(millis)
+ {
+  var date = new Date();
+  var curDate = null;
+  do { curDate = new Date(); }
+  while(curDate-date < millis);
+}
+pausecomp(500);
+
     writeCommand("manualPID");
 }
 
@@ -443,6 +456,17 @@ function onClickManualOutputBtn() {
     $("#ConfigurePID_ContainerNewOutput").show();
 
     writeCommand("manual");
+
+function pausecomp(millis)
+ {
+  var date = new Date();
+  var curDate = null;
+  do { curDate = new Date(); }
+  while(curDate-date < millis);
+}
+pausecomp(500);
+
+
     writeCommand("manualSetOutput");
 }
 

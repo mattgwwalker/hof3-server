@@ -61,6 +61,10 @@ function onClickStartBtn() {
     var startLevel = $('input[name=startLevel]').val()
     var doseTime = $('input[name=doseTime]').val()
 
+    var tempControl = $('input:radio[name=tempControl]:checked').val()
+    var desiredTemp = $('input[name=desiredTemp]').val()
+    var desiredTempHysteresis = $('input[name=desiredTempHysteresis]').val()
+
     var mixTime = $('input[name=mixTime]').val()
     var mixPressure = $('input[name=mixPressure]').val()
 
@@ -85,6 +89,17 @@ function onClickStartBtn() {
 
     var drainTime = $('input[name=drainTime]').val()
 
+    var faultMaxInletPressure = $('input[name=faultMaxInletPressure]').val();
+    var faultMaxTransMembranePressure = $('input[name=faultMaxTransMembranePressure]').val();
+    var faultMaxAlongMembranePressure = $('input[name=faultMaxAlongMembranePressure]').val();
+    var faultMaxBackPressure = $('input[name=faultMaxBackPressure]').val();
+    var faultMinTemp = $('input[name=faultMinTemp]').val();
+    var faultMaxTemp = $('input[name=faultMaxTemp]').val();
+    var faultMinPH = $('input[name=faultMinPH]').val();
+    var faultMaxPH = $('input[name=faultMaxPH]').val();
+
+    var logFreq = $('input[name=logFreq]').val();
+    var logBackwashDetail = $('input:radio[name=logBackwashDetail]:checked').val()
 
     // Send values to PLC
     $.ajax( {
@@ -95,6 +110,10 @@ function onClickStartBtn() {
                 "hof3.fillLevelHysteresis"  : fillLevelHysteresis,
                 "hof3.startLevel" : startLevel,
                 "hof3.chemicalDoseSP"   : doseTime,
+
+                "hof3.tempControl" : tempControl,
+                "hof3.desiredTemp" : desiredTemp,
+                "hof3.desiredTempHysteresis" : desiredTempHysteresis,
 
                 "hof3.mixTimeSP"  : mixTime,
                 "hof3.dpc01.outputs.mix" : mixPressure,
@@ -119,7 +138,20 @@ function onClickStartBtn() {
 
                 "hof3.drainTimeSP": drainTime,
 
-                "hof3.directionChangeTimeSP":60*60,
+                "hof3.directionChangeTimeSP": directionChangeFreq,
+
+                "hof3.faultMaxInletPressure" : faultMaxInletPressure,
+                "hof3.faultMaxTransMembranePressure" : faultMaxTransMembranePressure,
+                "hof3.faultMaxAlongMembranePressure" : faultMaxAlongMembranePressure,
+                "hof3.faultMaxBackPressure" : faultMaxBackPressure,
+                "hof3.faultMinTemp" : faultMinTemp,
+                "hof3.faultMaxTemp" : faultMaxTemp,
+                "hof3.faultMinPH" : faultMinPH,
+                "hof3.faultMaxPH" : faultMaxPH,
+
+                "hof3.logFreq" : logFreq,
+                "hof3.logBackwashDetail" : logBackwashDetail,
+
                 "hof3.command" : "recirc"
               }
         })
@@ -143,14 +175,19 @@ function getCurrentSettings() {
     //$("#Production_MainContainer").hide();
     $.mobile.loading( 'show', { text: "Loading current settings", textVisible: true });
     $.ajax( {
-        url: "read?obj=hof3.fillSource,hof3.fillLevel,hof3.fillLevelHysteresis,hof3.startLevel,hof3.chemicalDoseSP,hof3.mixTimeSP,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.dpc01.outputs.mix,hof3.membraneUseTimeSP,hof3.dpc01.setpoints.recirc,hof3.pc05.setpoints.prod,hof3.pc03.setpoints.prod,hof3.pc03.outputs.start,hof3.backwashTimeSP,hof3.recircTimeSP,hof3.rc01.setpoints.prod,hof3.endLevel,hof3.emptyLevel,hof3.drainDirectionChangeTimeSP,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.directionChangeTimeSP",
+        url: "read?obj=hof3.fillSource,hof3.fillLevel,hof3.fillLevelHysteresis,hof3.startLevel,hof3.chemicalDoseSP,hof3.desiredTemp,hof3.mixTimeSP,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.dpc01.outputs.mix,hof3.membraneUseTimeSP,hof3.dpc01.setpoints.recirc,hof3.pc05.setpoints.prod,hof3.pc03.setpoints.prod,hof3.pc03.outputs.start,hof3.backwashTimeSP,hof3.recircTimeSP,hof3.rc01.setpoints.prod,hof3.endLevel,hof3.emptyLevel,hof3.drainDirectionChangeTimeSP,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.directionChangeTimeSP,hof3.faultMaxInletPressure,hof3.faultMaxTransMembranePressure,hof3.faultMaxAlongMembranePressure,hof3.faultMaxBackPressure,hof3.faultMinTemp,hof3.faultMaxTemp,hof3.faultMinPH,hof3.faultMaxPH,hof3.logFreq",
         type: "GET"
     })
         .done( function(data) {
+            // FIXME: Need to get fillSource
             $('input[name=fillLevel]').val(data.hof3.fillLevel).slider("refresh");
             $('input[name=fillLevelHysteresis]').val(data.hof3.fillLevelHysteresis).slider("refresh");
             $('input[name=startLevel]').val(data.hof3.startLevel).slider("refresh");
             $('input[name=doseTime]').val(data.hof3.chemicalDoseSP);
+
+            // FIXME: Need to get temp control
+            $('input[name=desiredTemp]').val(data.hof3.desiredTemp).slider("refresh");
+            
 
             $('input[name=mixTime]').val(data.hof3.mixTimeSP);
             membraneMaxInletPressure = data.hof3.pc01.setpoints.membraneMaxInletPressure;
@@ -172,12 +209,27 @@ function getCurrentSettings() {
 
             $('input[name=emptyLevel]').val(data.hof3.endLevel).slider("refresh"); // FIXME
 
+/*
             $('input[name=drainDirectionChangeFreq]').val(data.hof3.drainDirectionChangeTimeSP);
 
             $('input[name=drainLevel]').val(data.hof3.emptyLevel).slider("refresh"); // FIXME
             $('input[name=drainPumpSpeed]').val(data.hof3.pc01.outputs.drain).slider("refresh");
 
             $('input[name=drainTime]').val(data.hof3.drainTimeSP);
+*/
+
+
+            $('input[name=faultMaxInletPressure]').val(data.hof3.faultMaxInletPressure);
+            $('input[name=faultMaxTransMembranePressure]').val(data.hof3.faultMaxTransMembranePressure);
+            $('input[name=faultMaxAlongMembranePressure]').val(data.hof3.faultMaxAlongMembranePressure);
+            $('input[name=faultMaxBackPressure]').val(data.hof3.faultMaxBackPressure);
+            $('input[name=faultMinTemp]').val(data.hof3.faultMinTemp);
+            $('input[name=faultMaxTemp]').val(data.hof3.faultMaxTemp);
+            $('input[name=faultMinPH]').val(data.hof3.faultMinPH);
+            $('input[name=faultMaxPH]').val(data.hof3.faultMaxPH);
+            
+            $('input[name=logFreq]').val(data.hof3.logFreq);
+            //$('input[name=logBackwashDetail]').val(data.hof3.logBackwashDetail);
 
             $.mobile.loading("hide");
             //$("#Production_MainContainer").show();

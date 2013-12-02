@@ -29,7 +29,8 @@ class PLCTime(PLCPrimitive):
 
     def __init__(self, plc, 
                  addressYear, addressMonth, addressDay, 
-                 addressHour, addressMinute, addressSecond):
+                 addressHour, addressMinute, addressSecond,
+                 addressHundredths = None):
         PLCPrimitive.__init__(self, plc)
         self.addressYear = addressYear
         self.addressMonth = addressMonth
@@ -37,6 +38,7 @@ class PLCTime(PLCPrimitive):
         self.addressHour = addressHour
         self.addressMinute = addressMinute
         self.addressSecond = addressSecond
+        self.addressHundredths = addressHundredths
 
     def getTime(self):
         """Obtains the values of the six registers the PLC uses to store a
@@ -57,19 +59,41 @@ class PLCTime(PLCPrimitive):
         deferreds.append( self.plc.getRegister(self.addressHour) )
         deferreds.append( self.plc.getRegister(self.addressMinute) )
         deferreds.append( self.plc.getRegister(self.addressSecond) )
+        if self.addressHundredths is not None:
+            deferreds.append( self.plc.getRegister(self.addressHundredths) )
             
 
         def formatResult(data):
+            if None in data:
+                # At least one of the items doesn't have valid data:
+                return None
+            if len(data) == 7:
+                print "data:",data
+                # Take data with hundredths and convert it to standard y-m-d-h-m-s.
+                seconds = int(data[5])+(int(data[6])/100.0)
+                data = list(data[0:5])+[seconds,]
             assert len(data) == 6
+
             data[0] = "20"+data[0]            # convert two-digit to four-digit year
             data = [int(i) for i in data]     # convert to ints
-            return datetime.datetime( *data ) # convert to datetime
+            try:
+                return datetime.datetime( *data ) # convert to datetime
+            except:
+                return None
 
         result = defer.gatherResults( deferreds )
         result.addCallback( formatResult )
 
         return result
 
+    def get(self):
+        d = self.getTime()
+        def onResult(data):
+            if data is None:
+                return None
+            return data.isoformat()
+        d.addCallback(onResult)
+        return d
 
 class PLCSystemTime(PLCTime):
     def __init__(self, plc):
@@ -227,7 +251,7 @@ class PLCInt(PLCPrimitive):
         d = self.plc.getRawRegister(self.address)
         def getResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
-            if data[0] == '\0':
+            if data is None or data[0] == '\0':
                 return None
             return int(data)
         d.addCallback( getResult )
@@ -346,7 +370,7 @@ class PLCFixed(PLCPrimitive):
         d = self.plc.getRawRegister(self.address) 
         def onResult(data):
             assert data != "" # If this happens then you've probably got the wrong memory address
-            if data[0] == '\0':
+            if data is None or data[0] == '\0':
                 return None
             return int(data)/float(self.scaleFactor)
         d.addCallback( onResult )

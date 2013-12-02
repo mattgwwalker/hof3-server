@@ -62,6 +62,8 @@ class ASCIIClientProtocol(LineReceiver):
         assert self._current != None
         self._commandQueue.popleft() # Remove the current command from the queue
         data = data[0:-2] # Remove the trailing \r\n
+        if data=='\0':
+            data = None
         for d in self._current.deferreds:
             d.callback(data)
 

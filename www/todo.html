@@ -4,6 +4,23 @@
 
 <h2>Things to fix with PLC code:</h2>
 <ul>
+  <li>Why does E-Stop change the position of DV07 and DV08?</li>
+
+  <li>Add setpoint ramping to PC01</li>
+
+  <li>Faults are only caught on entry.  If there's a new fault, it's
+  not logged.  Check to see if the fault message changes.</li>
+
+  <li>NO. Add backwash count to log</li>
+
+  <li>DONE calm down the coefficients for the pump</li>
+
+  <li>DONE Add ratio and max backflush pressure to logging</li>
+
+  <li>TO TEST Add logging at intervals</li>
+
+  <li>DONE Add the ability to turn off backwash logging.</li>
+
   <li>DONE The PID controller for PC03 jumps out of manual setpoint all on
   its own.  Fix this.</li>
 
@@ -13,45 +30,45 @@
   a part of production, but add the ability to skip it (-1 in empty
   level, for example).</li>
  
-  <li>Add PID controllers for heating and cooling (user chooses).</li>
+  <li>DONE Add PID controllers for heating and cooling (user chooses).</li>
 
-  <li>If dosing is longer than mixing+recirc, then dosing is cut
+  <li>DONE Add fault checking for pressures, pH, and temps.</li>
+
+  <li>DONE If dosing is longer than mixing+recirc, then dosing is cut
   short.</li>
 
-  <li>Change dosing to be measured as a chemical concentration
+  <li>IGNORED Change dosing to be measured as a chemical concentration
   (percentage of tank).  Dosing pump gives an average 3.82mL/s at 90%
   on pump's dial.</li>
 
-  <li>Add fault checking for pressures and pH.</li>
-
-  <li>During Mixing, DV03 is currently in the wrong direction.  The
+  <li>DONE During Mixing, DV03 is currently in the wrong direction.  The
   problem is that liquid can pass through the membrane and out the
   permeate line.  The solution is to close off DV03 during Mixing.  It
   seems that the position of DV02 might also need to be considered in
   the same way.  It seems that this depends on the last direction
   change.</li>
 
-  <li>The pause command does not pause the filling of product.</li>
+  <li>IGNORED The pause command does not pause the filling of product.</li>
 
-  <li>The direction change timers do not reset to zero.  Should they?
+  <li>IGNORED The direction change timers do not reset to zero.  Should they?
   Is it better that we do not and rather keep a consistent duration
   between direction changes?</li>
 
-  <li>There is currently no provision for the user to fill the tank on
+  <li>FIXED There is currently no provision for the user to fill the tank on
   their own.  What would happen if we set fillSource to none and
   started production?</li>
 
-  <li>When a fault occurs, the PIDs might be frozen, but the timers
+  <li>IGNORED When a fault occurs, the PIDs might be frozen, but the timers
   don't seem to be.  It moved states while faulting after ~30
   seconds.</li>
 
-  <li>When the process is aborted, the concentration ratio reverts to
+  <li>ME When the process is aborted, the concentration ratio reverts to
   one.  This isn't necessary.  Fix it.</li>
 
-  <li>Add backflush-return states so that piston can return to normal
+  <li>ME Add backflush-return states so that piston can return to normal
   position while PID controllers are still frozen.</li>
 
-  <li>Add storage tank status.  When filling from storage tank use
+  <li>ME Add storage tank status.  When filling from storage tank use
   this value as the new plant status.</li>
 
 </ul>

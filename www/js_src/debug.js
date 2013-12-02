@@ -2,7 +2,7 @@
 var eventSource;
 
 function openEventSource() {
-    var address = "/events?obj=hof3.checkAuto,hof3.stepNum,hof3.fillSource,hof3.productionSelectionMsg,hof3.cipSelectionMsg,hof3.rinseSelectionMsg,hof3.faultMsg,hof3.fillLevel,hof3.plantStatus,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP";
+    var address = "/events?obj=hof3.checkAuto,hof3.stepNum,hof3.fillSource,hof3.productionSelectionMsg,hof3.cipSelectionMsg,hof3.rinseSelectionMsg,hof3.faultMsg,hof3.fillLevel,hof3.plantStatus,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.tempControl,hof3.desiredTemp,hof3.desiredTempHysteresis,hof3.tt01,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP";
     console.log("Creating EventSource from "+address);
     return new EventSource(address);
 }
@@ -32,6 +32,10 @@ function onEventSourceMessage(event) {
                                   data.hof3.pc01.setpoints.membraneMaxInletPressure+
                                   " barg maximum inlet pressure for membrane");
     $("#Debug_MembraneMaxInletPressure").html(data.hof3.pc01.setpoints.membraneMaxInletPressure+" barg");
+    $("#Debug_TemperatureControl").html(data.hof3.tempControl);
+    $("#Debug_DesiredTemperature").html(data.hof3.desiredTemp+"&deg;C");
+    $("#Debug_DesiredTemperatureHysteresis").html(data.hof3.desiredTempHysteresis);
+    $("#Debug_TT01").html(data.hof3.tt01+"&deg;C");
 
     $("#Debug_RecircTime").html(data.hof3.recircTimeSP+" seconds");
     $("#Debug_MembraneUseTimer").html(data.hof3.membraneUseTimer+" seconds");
