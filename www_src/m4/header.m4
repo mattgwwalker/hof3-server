@@ -23,8 +23,12 @@ define(`htmlHeader',`dnl
   <script src="js/flot/jquery.flot.time.js"></script>
 
 dnl These scripts should be turned into one file to enhance loading times.
+  <script src="js_src/utils.js"></script>
+  <script src="js_src/warnings_and_errors.js"></script>
   <script src="js_src/production.js"></script>
+  <script src="js_src/drain.js"></script>
   <script src="js_src/debug.js"></script>
+  <script src="js_src/configure_pid.js"></script>
 
 </head>
 

@@ -1,0 +1,48 @@
+include(`m4/header.m4')dnl
+htmlHeader(`Draining',`Drain_Page')
+
+<h2>Draining</h2>
+
+<p>This value applies to both the Pump to drain state and the Passive drain state.</p>
+
+  <label for="drainDirectionChangeFreq">Direction change frequency
+  during draining (seconds between direction changes):</label>
+  <input name="drainDirectionChangeFreq" id="drainDirectionChangeFreq" type="text">
+
+
+<h2>Pump to drain</h2>
+
+<p>Once the feed tank has been lowered to its empty level, the
+remaining plant contents are pumped to drain.</p>
+
+  <label for="drainLevel">Drain level (%):</label>
+  <input name="drainLevel" id="drainLevel" data-highlight="true" min="0" max="100" value="5" type="range">
+
+  <label for="drainPumpSpeed">Pump speed to drain (%):</label>
+  <input name="drainPumpSpeed" id="drainPumpSpeed" data-highlight="true" min="0" max="100" value="25" type="range">
+
+<h2>Passive drain</h2>
+
+<p>In this stage, the remaining plant contents can no longer be
+pumped.  The valves are left open and the membrane direction valves
+change, in order to let the plant drain completely.</p>
+
+  <label for="drainTime">Drain time:</label>
+  <input name="drainTime" id="drainTime" type="text">
+
+
+
+
+
+
+
+<h1>Messages</h1>
+<div id="Drain_Message">Waiting for plant status information</div>
+
+
+<button id="Drain_StartBtn" data-theme="b">Start Drain</button>
+
+
+
+
+htmlHeaderEnd()

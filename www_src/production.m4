@@ -7,17 +7,34 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
 <h2>Membrane</h2>
 
 <p>Select the membrane that is currently installed.  A new membrane
-may be added via the Membrane Page (TODO).</p>
+may be added via the <a href="membrane.html">Membrane Page</a>.</p>
+
+<label for="Production_MembraneSelect" class="ui-hidden-accessible">Membrane:</label>
+<select data-native-menu="false" id="Production_MembraneSelect">
+  <option value="">Select the currently installed membrane</option>
+</select>
+
 
 <h2>Bag Filter</h2>
 
 <p>Select the currently installed bag filter.  A new filter can be
 specified at the Bag Filter Page (TODO).</p>
 
+<label for="Production_BagFilterSelect" class="ui-hidden-accessible">Bag filter:</label>
+<select data-native-menu="false" id="Production_BagFilterSelect">
+  <option value="">Select the currently installed bag filter</option>
+</select>
+
+
 <h2>Product</h2>
 
 <p>Select the product that you're using.  Add a new product via the
 Product Page (TODO).</p>
+
+<label for="Production_ProductSelect" class="ui-hidden-accessible">Product:</label>
+<select data-native-menu="false" id="Production_ProductSelect">
+  <option value="">Select the current product</option>
+</select>
 
 <h2>Auto Chemical</h2>
 
@@ -25,11 +42,20 @@ Product Page (TODO).</p>
 chemical that will be used for automatic dosing calculations.  Add a
 new entry via the Chemicals Page (TODO).</p>
 
+<label for="Production_AutoChemicalSelect" class="ui-hidden-accessible">Auto chemical:</label>
+<select data-native-menu="false" id="Production_AutoChemicalSelect">
+  <option value="">Select the chemical currently in the rig's chemical tank</option>
+</select>
+
 <h2>Custom Chemical</h2>
 
 <p>Select the chemical that you're using.  Add a new entry via the
 Chemicals Page (TODO).</p>
 
+<label for="Production_CustomChemicalSelect" class="ui-hidden-accessible">Custom Chemical:</label>
+<select data-native-menu="false" id="Production_CustomChemicalSelect">
+  <option value="">Select the chemical currently in use</option>
+</select>
 
 
 <h2>Filling</h2>
@@ -259,6 +285,7 @@ logging. </p>
   <li>Check the values of the inputs before attempting to send them.
   Also, the server errors where is should just return false when no
   value or an invalid value is specified.</li>
+  <li>Check which selection message should be considered based on fillSource</li>
 </ul>
 
 </div> <!-- End of 'Production_MainContainer' -->

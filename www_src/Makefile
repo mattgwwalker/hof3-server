@@ -20,5 +20,5 @@ $(HTML_TARGETS) : $(DEST)/%.html : %.m4
 
 .PHONY: clean
 clean:
-	rm -r $(DEST) 
+	rm -rf $(DEST) 
 	mkdir $(DEST)
