@@ -1,47 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html>
-<head>
-  <title>Configure PID Controller</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/custom.css" />
-  <link rel="stylesheet" href="css/default-plus-f.min.css" />
-  <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.css" />
-  <script src="js/jquery-1.9.1.js"></script>
-  <script src="js/jquery.mobile-1.3.2.js"></script>
-  <script src="js/flot/jquery.flot.js"></script>
-  <script src="js/flot/jquery.flot.time.js"></script>
-
-  <script src="js_src/utils.js"></script>
-  <script src="js_src/warnings_and_errors.js"></script>
-  <script src="js_src/add_new_membrane.js"></script>
-  <script src="js_src/view_edit_membrane.js"></script>
-  <script src="js_src/add_new_cleaning_regime.js"></script>
-  <script src="js_src/configure_pid.js"></script>
-
-</head>
-
-<body>
-<div data-role="page" id="ConfigurePID_Page">
-
-<div data-role="header" id="ConfigurePID_Page-Header">
-  <h1>Configure PID Controller</h1>
-</div>
-
-<div data-role="popup" id="ConfigurePID_Page-ErrorPopup" data-theme="e">
-  <div data-role="header" data-theme="e">
-    <h1 id="ConfigurePID_Page-ErrorPopupTitle">Error</h1>
-  </div>
-  <div data-role="content" id="ConfigurePID_Page-ErrorPopupText" data-theme="e">
-  </div>
-</div>  
-
-<div data-role="content" id="ConfigurePID_Page-Content">
-  <div id="ConfigurePID_Page-Message" class="ui-body ui-body-e" style="display:none;">
-  </div>
-
-
-<!-- End of boilerplate -->
+include(`m4/header.m4')dnl
+htmlHeader(`Configure PID Controller',`ConfigurePID_Page')
 
 
 <label for="ConfigurePID_Controller">Controller:</label>
@@ -135,9 +93,4 @@
 
 </div> <!-- ControllerDetails -->
 
-</div> <!-- End of 'content'-->
-
-</div> <!-- End of 'page'-->
-</body>
-</html>
-
+htmlHeaderEnd()

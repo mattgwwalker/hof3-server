@@ -1,48 +1,37 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HT5ML//EN">
-<html>
-<head>
-  <title>Basic Production</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/custom.css" />
-  <link rel="stylesheet" href="css/default-plus-f.min.css" />
-  <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.css" />
-  <script src="js/jquery-1.9.1.js"></script>
-  <script src="js/jquery.mobile-1.3.2.js"></script>
-  <script src="js/flot/jquery.flot.js"></script>
-  <script src="js/flot/jquery.flot.time.js"></script>
+include(`m4/header.m4')dnl
+htmlHeader(`Advanced Run Settings',`Production_Page')
 
-  <script src="js_src/utils.js"></script>
-  <script src="js_src/warnings_and_errors.js"></script>
-  <script src="js_src/production.js"></script>
-
-</head>
-
-<body>
-<div data-role="page" id="Production_Page">
-
-<div data-role="header" id="Production_Page-Header">
-  <h1>Advanced Production</h1>
-</div>
-
-<div data-role="popup" id="Production_Page-ErrorPopup" data-theme="e">
-  <div data-role="header" data-theme="e">
-    <h1 id="Production_Page-ErrorPopupTitle">Error</h1>
-  </div>
-  <div data-role="content" id="Production_Page-ErrorPopupText" data-theme="e">
-  </div>
-</div>  
-
-<div data-role="content" id="Production_Page-Content">
-  <div id="Production_Page-Message" class="ui-body ui-body-e" style="display:none;">
-  </div>
-
-
-<!-- End of boilerplate -->
-
-<h1>Advanced Run Settings</h1>
 
 <div id="Production_MainContainer">
+
+<h2>Membrane</h2>
+
+<p>Select the membrane that is currently installed.  A new membrane
+may be added via the Membrane Page (TODO).</p>
+
+<h2>Bag Filter</h2>
+
+<p>Select the currently installed bag filter.  A new filter can be
+specified at the Bag Filter Page (TODO).</p>
+
+<h2>Product</h2>
+
+<p>Select the product that you're using.  Add a new product via the
+Product Page (TODO).</p>
+
+<h2>Auto Chemical</h2>
+
+<p>Select the chemical that's in the rig's chemical tank.  It is this
+chemical that will be used for automatic dosing calculations.  Add a
+new entry via the Chemicals Page (TODO).</p>
+
+<h2>Custom Chemical</h2>
+
+<p>Select the chemical that you're using.  Add a new entry via the
+Chemicals Page (TODO).</p>
+
+
+
 <h2>Filling</h2>
 
   <p>The first stage of production is to fill the feed tank with
@@ -275,11 +264,4 @@ logging. </p>
 </div> <!-- End of 'Production_MainContainer' -->
 
 
-<!-- Start of terminating boilerplate -->
-
-</div> <!-- End of 'content'-->
-
-</div> <!-- End of 'page'-->
-</body>
-</html>
-
+htmlHeaderEnd()

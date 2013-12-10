@@ -1,44 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HT5ML//EN">
-<html>
-<head>
-  <title>Debug</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/custom.css" />
-  <link rel="stylesheet" href="css/default-plus-f.min.css" />
-  <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.css" />
-  <script src="js/jquery-1.9.1.js"></script>
-  <script src="js/jquery.mobile-1.3.2.js"></script>
-  <script src="js/flot/jquery.flot.js"></script>
-  <script src="js/flot/jquery.flot.time.js"></script>
-
-  <script src="js_src/utils.js"></script>
-  <script src="js_src/warnings_and_errors.js"></script>
-  <script src="js_src/debug.js"></script>
-
-</head>
-
-<body>
-<div data-role="page" id="Debug_Page">
-
-<div data-role="header" id="Debug_Page-Header">
-  <h1>Debug</h1>
-</div>
-
-<div data-role="popup" id="Debug_Page-ErrorPopup" data-theme="e">
-  <div data-role="header" data-theme="e">
-    <h1 id="Debug_Page-ErrorPopupTitle">Error</h1>
-  </div>
-  <div data-role="content" id="Debug_Page-ErrorPopupText" data-theme="e">
-  </div>
-</div>  
-
-<div data-role="content" id="Debug_Page-Content">
-  <div id="Debug_Page-Message" class="ui-body ui-body-e" style="display:none;">
-  </div>
-
-
-<!-- End of boilerplate -->
+include(`m4/header.m4')dnl
+htmlHeader(`Debug',`Debug_Page')
 
 <h2>Automatic</h2>
 
@@ -67,6 +28,10 @@
   <li>Rinse: <span id="Debug_RinseSelectionMessage"></span></li>
   <li>Fault: <span id="Debug_FaultMessage"></span></li>
 </ul>
+
+<button id="Debug_DisableFaultsBtn" data-theme="b">Disable fault monitoring</button>
+<button id="Debug_EnableFaultsBtn" data-theme="b">Enable fault monitoring</button>
+
 
 
 <h2>Filling</h2>
@@ -146,11 +111,6 @@
 
 
 
-<!-- Start of terminating boilerplate -->
 
-</div> <!-- End of 'content'-->
-
-</div> <!-- End of 'page'-->
-</body>
-</html>
+htmlHeaderEnd()
 

@@ -107,7 +107,7 @@ function resetToAutomatic() {
                 "hof3.pp01" : "auto",
                 "hof3.pp02" : "auto",
                 "hof3.pp03" : "auto",
-                "hof3.dpc01" : "auto",
+                "hof3.dpc01": "auto",
                 "hof3.pc01" : "auto",
                 "hof3.pc03" : "auto",
                 "hof3.pc05" : "auto",
@@ -184,6 +184,37 @@ function onClickAbortBtn() {
 }
 
 
+function onClickDisableFaultsBtn() {
+    $.ajax( {
+        url: "write",
+        type: "GET",
+        data: { "hof3.faultCommand" : "Disable faults"
+              }
+        })
+        .done( function(data) {
+            alert("Disabled fault checking.");
+        })
+        .fail( function(data) {
+            showError("Error","Failed to send command to disable faults.  Are you still connected to HOF3?");
+        });
+}
+
+function onClickEnableFaultsBtn() {
+    $.ajax( {
+        url: "write",
+        type: "GET",
+        data: { "hof3.faultCommand" : "Enable faults"
+              }
+        })
+        .done( function(data) {
+            alert("Enabled fault checking.");
+        })
+        .fail( function(data) {
+            showError("Error","Failed to send command to enable faults.  Are you still connected to HOF3?");
+        });
+}
+
+
 // Page initialisation event
 $(document).on( "pageinit", "#Debug_Page", function(event) {
     $("#Debug_ResetToAutoBtn").click(resetToAutomatic);
@@ -191,6 +222,8 @@ $(document).on( "pageinit", "#Debug_Page", function(event) {
     $("#Debug_PauseBtn").click(onClickPauseBtn);
     $("#Debug_StopBtn").click(onClickStopBtn);
     $("#Debug_AbortBtn").click(onClickAbortBtn);
+    $("#Debug_DisableFaultsBtn").click(onClickDisableFaultsBtn);
+    $("#Debug_EnableFaultsBtn").click(onClickEnableFaultsBtn);
 });
 
 

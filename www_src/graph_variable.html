@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+  <title>Graph Variable</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/custom.css" />
+  <link rel="stylesheet" href="css/default-plus-f.min.css" />
+  <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.css" />
+  <script src="js/jquery-1.9.1.js"></script>
+  <script src="js/jquery.mobile-1.3.2.js"></script>
+  <script src="js/flot/jquery.flot.js"></script>
+  <script src="js/flot/jquery.flot.time.js"></script>
+
+  <script src="js_src/utils.js"></script>
+  <script src="js_src/warnings_and_errors.js"></script>
+  <script src="js_src/graph_variable.js"></script>
+</head>
+
+<body>
+<div data-role="page" id="GraphVariable_Page">
+
+<div data-role="header" id="GraphVariable_Page-Header">
+  <h1>Graph Variable</h1>
+</div>
+
+<div data-role="popup" id="GraphVariable_Page-ErrorPopup" data-theme="e">
+  <div data-role="header" data-theme="e">
+    <h1 id="GraphVariable_Page-ErrorPopupTitle">Error</h1>
+  </div>
+  <div data-role="content" id="GraphVariable_Page-ErrorPopupText" data-theme="e">
+  </div>
+</div>  
+
+<div data-role="content" id="GraphVariable_Page-Content">
+  <div id="GraphVariable_Page-Message" class="ui-body ui-body-e" style="display:none;">
+  </div>
+
+
+<!-- End of boilerplate -->
+
+
+<label for="GraphVariable_Variable">Variable:</label>
+<select id="GraphVariable_Variable" data-native-menu="false">
+  <option>Choose a variable to graph</option>
+  <!-- Other options are added dynamically -->
+</select>
+
+<label for="GraphVariable_Duration">Display history:</label>
+<select id="GraphVariable_Duration" data-native-menu="false">
+  <option value="120">2 minutes</option>
+  <option value="600">10 minutes</option>
+  <option value="1800">30 minutes</option>
+  <option value="3600">1 hour</option>
+</select>
+
+<div id="GraphVariable_ContainerGraph">
+  <div id="Graph" style="width:100%; height:100px;"></div>
+
+  <table style="border-spacing: 0.5em 0.3em;">
+    <tr><td>Current value:</td><td id="GraphVariable_Label"></td><td id="GraphVariable_Value"></td></tr>
+  </table>
+</div>
+
+</div> <!-- End of 'content'-->
+
+</div> <!-- End of 'page'-->
+</body>
+</html>
+
