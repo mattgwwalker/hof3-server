@@ -205,3 +205,6 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("logBackwashDetail", PLCInt( self, PLCUserMemory(956)))
         self.addChild("logFreq", PLCTimer(self, PLCUserMemory(888)))
         self.addChild("logTimer", PLCTimer(self, PLCUserMemory(886)))
+
+
+        self.addChild("faultCommand", PLCEnum( self, PLCUserMemory(902), ["None","Reset [Not Implemented]","Enable faults","Disable faults"]))

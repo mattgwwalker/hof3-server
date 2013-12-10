@@ -9,8 +9,7 @@ from PLCObjects import *
 from HOF3 import HOF3Client
 
 from EventSource import EventSource
-from Test import Test
-from Test2 import Test2
+from Logger import Logger
 
 from Read import Read
 from Write import Write
@@ -20,7 +19,6 @@ from Write import Write
 plc = HOF3Client()
 #print "Electing not to connect to the PLC"
 reactor.connectTCP("192.168.1.91", 10001, plc, 5)
-
 
 
 # Get PLC time
@@ -33,18 +31,12 @@ d.addCallback(onResult)
 #plcTime.set(None) # Set PLC to current server time
 
 
-
-
-
-
-
 # Start listening as HTTP server
 root = File("www")
 root.putChild("events", EventSource(plc))
 root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))
-root.putChild("test", Test(plc))
-root.putChild("test2", Test2(plc))
+root.putChild("logger", Logger(plc))
 factory = Site(root)
 reactor.listenTCP(8000, factory)
 reactor.run()

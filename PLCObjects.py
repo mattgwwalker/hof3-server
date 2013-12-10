@@ -283,7 +283,7 @@ class PLCLog(PLCObject):
         self.r01LogAddress  = startAddress + 22
         self.maxBackwashPressureLogAddress  = startAddress + 24
 
-        eventLabels = {0:"None",
+        eventLabels = {0:"Unknown",
                        -1:"On timer",
                        1:"Started",
                        2:"Finished",
