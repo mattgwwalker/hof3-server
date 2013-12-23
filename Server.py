@@ -33,6 +33,7 @@ d.addCallback(onResult)
 
 # Start listening as HTTP server
 root = File("www")
+#root.putChild("membrane_insert", Membrane(plc))
 root.putChild("events", EventSource(plc))
 root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))

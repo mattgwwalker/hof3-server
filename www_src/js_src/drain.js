@@ -3,7 +3,7 @@ var drain = function() {
     var eventSource;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.checkAuto,hof3.drainSelectionMsg,hof3.stepNum";
+        var address = "/events?obj=hof3.checkAuto,hof3.wasteSelectionMsg,hof3.storeSelectionMessage,hof3.stepNum";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -16,12 +16,25 @@ var drain = function() {
         var selectionMsg;
         // Check the PLC is awaiting commands
         if (data.hof3.stepNum == "Awaiting command") {
-            // Check that there are no problems with selecting "production".
-            if (data.hof3.drainSelectionMsg == "Everything's fine") {
-                selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
-            } else {
-                selectionMsg = "<p><b>Error:</b> "+data.hof3.productionSelectionMsg+".</p>";
-                disableBtn = true;
+            var command = $('input:radio[name=target]:checked').val()
+            if (command=="waste") {
+                // We're going to be asking to send feed tank to waste
+                // Check that there are no problems with the selection
+                if (data.hof3.wasteSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+                } else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.wasteSelectionMsg+".</p>";
+                    disableBtn = true;
+                }
+            } else if (command=="store") {
+                // We're going to be asking to send feed tank to storage tank
+                // Check that there are no problems with the selection
+                if (data.hof3.storeSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+                } else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.storeSelectionMsg+".</p>";
+                    disableBtn = true;
+                }
             }
         } else {
             selectionMsg = "<p><b>Error:</b> The PLC is busy and not ready to accept your command.</p>";
@@ -55,7 +68,9 @@ var drain = function() {
 
 
     function onClickStartBtn() {
-        // Get valves from interface
+        // Get values from interface
+        var command = $('input:radio[name=target]:checked').val()
+
         var drainDirectionChangeFreq = $('input[name=drainDirectionChangeFreq]').val();
 
         var emptyLevel = $('input[name=drainLevel]').val() // FIXME: Is it empty level or drain level choose one!
@@ -74,7 +89,7 @@ var drain = function() {
 
                     "hof3.drainTimeSP": drainTime,
 
-                    "hof3.command" : "drain"
+                    "hof3.command" : command
                   }
         })
             .done( function(data) {

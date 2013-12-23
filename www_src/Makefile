@@ -12,6 +12,7 @@ copy_only: clean
 	ln -sr css $(DEST)
 	ln -sr js $(DEST)
 	ln -sr js_src $(DEST) # This needs to be replaced with just a single, minimized file.
+	cp display.html $(DEST)
 	echo "The contents of this directory are generated automatically by running the makefile in ../www_src." > $(DEST)/README 
 
 

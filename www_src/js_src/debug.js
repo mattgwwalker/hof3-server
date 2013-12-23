@@ -3,7 +3,7 @@ var debug = function() {
     var eventSource;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.checkAuto,hof3.stepNum,hof3.fillSource,hof3.productionSelectionMsg,hof3.cipSelectionMsg,hof3.rinseSelectionMsg,hof3.faultMsg,hof3.fillLevel,hof3.plantStatus,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.tempControl,hof3.desiredTemp,hof3.desiredTempHysteresis,hof3.tt01,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP";
+        var address = "/events?obj=hof3.checkAuto,hof3.stepNum,hof3.fillSource,hof3.runSiteSelectionMsg,hof3.runNoneSelectionMsg,hof3.runAutoChemSelectionMsg,hof3.runWaterSelectionMsg,hof3.runStoreSelectionMsg,hof3.wasteSelectionMsg,hof3.storeSelectionMsg,hof3.storeToWasteSelectionMsg,hof3.faultMsg,hof3.fillLevel,hof3.feedTankContents,hof3.feedTankState,hof3.storageTankContents,hof3.storageTankState,hof3.startLevel,hof3.lt01,hof3.mixTimeSP,hof3.stepTimer,hof3.dpc01.outputs.mix,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.tempControl,hof3.desiredTemp,hof3.desiredTempHysteresis,hof3.tt01,hof3.recircTimeSP,hof3.membraneUseTimer,hof3.dpc01.setpoints.recirc,hof3.backwashTopTimeSP,hof3.backwashBottomTimeSP,hof3.backwashTimeSP,hof3.backwashTimer,hof3.recircToTopTimeSP,hof3.recircToBottomTimeSP,hof3.directionChangeTimeSP,hof3.routeStepTimer,hof3.directionChangeTimer,hof3.membraneUseTimeSP,hof3.endLevel,hof3.emptyLevel,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.drainRouteTimeSP";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -14,11 +14,17 @@ var debug = function() {
         $("#Debug_AutomaticState").html(data.hof3.checkAuto);
 
         $("#Debug_State").html(data.hof3.stepNum);
-        $("#Debug_Contents").html(data.hof3.plantStatus);
+        $("#Debug_FeedTankStatus").html(data.hof3.feedTankContents+", "+data.hof3.feedTankState);
+        $("#Debug_StorageTankStatus").html(data.hof3.storageTankContents+", "+data.hof3.storageTankState);
 
-        $("#Debug_ProductionSelectionMessage").html(data.hof3.productionSelectionMsg);
-        $("#Debug_CIPSelectionMessage").html(data.hof3.cipSelectionMsg);
-        $("#Debug_RinseSelectionMessage").html(data.hof3.rinseSelectionMsg);
+        $("#Debug_RunSiteSelectionMessage").html(data.hof3.runSiteSelectionMsg);
+        $("#Debug_RunNoneSelectionMessage").html(data.hof3.runNoneSelectionMsg);
+        $("#Debug_RunAutoChemSelectionMessage").html(data.hof3.runAutoChemSelectionMsg);
+        $("#Debug_RunWaterSelectionMessage").html(data.hof3.runWaterSelectionMsg);
+        $("#Debug_RunStoreSelectionMessage").html(data.hof3.runStoreSelectionMsg);
+        $("#Debug_WasteSelectionMessage").html(data.hof3.wasteSelectionMsg);
+        $("#Debug_StoreSelectionMessage").html(data.hof3.storeSelectionMsg);
+        $("#Debug_StoreToWasteSelectionMessage").html(data.hof3.storeToWasteSelectionMsg);
         $("#Debug_FaultMessage").html(data.hof3.faultMsg);
 
         $("#Debug_FillSource").html(data.hof3.fillSource);
@@ -45,13 +51,13 @@ var debug = function() {
         $("#Debug_BackwashTopTime").html(data.hof3.backwashTopTimeSP+" seconds");
         $("#Debug_BackwashBottomTime").html(data.hof3.backwashBottomTimeSP+" seconds");
         $("#Debug_BackwashTime").html(data.hof3.backwashTimeSP+" seconds");
-        $("#Debug_BackwashTimer").html(data.hof3.backwashTimer+" seconds");
+        $("#Debug_BackwashFreqTimer").html(data.hof3.backwashTimer+" seconds");
 
         $("#Debug_DirectionChangeTime").html(data.hof3.directionChangeTimeSP+" seconds");
-        $("#Debug_DirectionChangeFreqTimer").html(data.hof3.routeStepTimer+" seconds");
+        $("#Debug_DirectionChangeFreqTimer").html(data.hof3.directionChangeTimer+" seconds");
         $("#Debug_DirectionChangeTopTime").html(data.hof3.recircToTopTimeSP+" seconds");
         $("#Debug_DirectionChangeBottomTime").html(data.hof3.recircToBottomTimeSP+" seconds");
-        $("#Debug_DirectionChangeDurationTimer").html(data.hof3.directionChangeTimer+" seconds");
+        $("#Debug_DirectionChangeDurationTimer").html(data.hof3.routeStepTimer+" seconds");
 
         $("#Debug_ConcentrationTime").html(data.hof3.membraneUseTimeSP+" seconds");
 

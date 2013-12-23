@@ -200,7 +200,7 @@ class PLCPIDController(PLCObject):
                              "progOutModePID", "modeManEnable", "autoInterlock", "manInterlock", 
                              "setOutputInterlock", "pidInterlock", "spRampOFFInterlock", 
                              "spRampONInterlock", "cvP"]    
-        self.labelsCommand = ["none","auto","manual","manualSetOutput","manualPID"]
+        self.labelsCommand = ["none","auto","manual","manualSetOutput","manualPID","reverseOff","reverseOn","disallowManual","allowManual","rampingOff","rampingOn"]
 
         self.status = PLCBitSet(self.plc, [self.addressStatus], [self.labelsStatus])
         self.addChild("status", self.status)
@@ -214,7 +214,7 @@ class PLCPIDController(PLCObject):
         self.sp = PLCFixed(self.plc, self.addressSP, self.scaleFactor) 
         self.cv = PLCFixed(self.plc, self.addressCV, 100) # scale factor is 100 here as the 
                                                           # outputs are percentages
-        self.rampTarget = PLCFixed(self.plc, self.addressSPRampTarget, 100) 
+        self.rampTarget = PLCFixed(self.plc, self.addressSPRampTarget, self.scaleFactor) 
         variables = PLCObject(self.plc)
         variables.addChild("pv", self.pv)
         variables.addChild("cv", self.cv)
@@ -227,8 +227,8 @@ class PLCPIDController(PLCObject):
         self.p = PLCFixed(self.plc, self.addressP, 100)
         self.i = PLCFixed(self.plc, self.addressI, 100)
         self.d = PLCFixed(self.plc, self.addressD, 100)
-        self.rampRate = PLCFixed(self.plc, self.addressSPRampRate, 100)
-        self.rampMaxErr = PLCFixed(self.plc, self.addressSPRampMaxErr, 100)
+        self.rampRate = PLCFixed(self.plc, self.addressSPRampRate, self.scaleFactor)
+        self.rampMaxErr = PLCFixed(self.plc, self.addressSPRampMaxErr, self.scaleFactor)
         config = PLCObject(self.plc)
         config.addChild("p", self.p)
         config.addChild("i", self.i)
@@ -292,12 +292,13 @@ class PLCLog(PLCObject):
                        10:"Filling started",
                        11:"Mixing started",
                        12:"Recirculating started",
-                       13:"Concentrating started",
-                       14:"Emptying to site started",
-                       15:"Pumping to drain started",
-                       16:"Passive draining started",
-                       17:"Pumping to store started",
-                       18:"Passive draining to store started",
+                       13:"Blast cleaning started",
+                       14:"Concentrating started",
+                       15:"Emptying to site started",
+                       16:"Pumping to drain started",
+                       17:"Passive draining started",
+                       18:"Pumping to store started",
+                       19:"Passive draining to store started",
                        20:"Backwash started",
                        21:"Direction change started",
                        22:"Maximum backwash pressure",
@@ -321,7 +322,8 @@ class PLCLog(PLCObject):
                        10020:"Backwash pressure too high", 
                        10021:"Along-membrane pressure too high", 
                        10022:"Feed tank pH too low", 
-                       10023:"Feed tank pH too high"}
+                       10023:"Feed tank pH too high",
+                       10024:"Pressure drop across bag filter too high"}
 
         
 
@@ -344,7 +346,19 @@ class PLCLog(PLCObject):
         self.readPtr = self.addChild( "readPtr", PLCInt(plc, 491))
         self.writePtr = self.addChild( "writePtr", PLCInt(plc, 489))
 
+        # Get the maximum number of samples in log, and then set the ready flag
+        def onResult(data):
+            self.maxSamples = data
+            self.ready = True
+        d = PLCInt(plc, 487).get()
+        d.addCallback(onResult)
+
+        self.ready = False
+
     def get(self):
+        if not self.ready:
+            return None
+
         d = PLCObject.get(self)
         def onResult(data):
             if (data["writePtr"] == 0 
@@ -353,7 +367,10 @@ class PLCLog(PLCObject):
                 pass
             else:
                 # Increment read pointer
-                self.readPtr.set( data["readPtr"]+1 )
+                readPtr = (data["readPtr"] + 1) % self.maxSamples
+                if readPtr == 0:
+                    readPtr = 1
+                self.readPtr.set( readPtr )
             return data
         d.addCallback(onResult)
         return d

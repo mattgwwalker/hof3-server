@@ -114,7 +114,7 @@ Chemicals Page (TODO).</p>
   </fieldset>
 
 
-  <label for="desiredTemp">Desired temperature (&deg;C) (FIXME: Get maximum from lowest of max temp of machine and of membrane and of product):</label>
+  <label for="desiredTemp">Desired temperature (&deg;C) (FIXME: Get maximum from lowest of max temp of machine and of membrane and of product; min fill of 40% is required for heating):</label>
   <input name="desiredTemp" id="desiredTemp" data-highlight="true" min="0" max="100" value="20" type="range">
 
   <label for="desiredTempHysteresis">Desired temperature hysteresis (&deg;C):</label>
@@ -149,6 +149,9 @@ Chemicals Page (TODO).</p>
   recirculating and concentrating time before the plant stops
   itself):</label>
   <input name="membraneUseTime" id="membraneUseTime" type="text">
+
+  <label for="membraneMaxInletPressure">Target maximum membrane inlet pressure (bar):</label>
+  <input name="membraneMaxInletPressure" id="membraneMaxInletPressure" type="text">
 
   <label for="alongMembranePressure">Along-membrane pressure drop target (bar):</label>
   <input name="alongMembranePressure" id="alongMembranePressure" type="text">
@@ -186,6 +189,20 @@ Chemicals Page (TODO).</p>
   <label for="recicTime">Recirculating time:</label>
   <input name="recircTime" id="recircTime" type="text">
 
+  <p>For cleaning, during recirulating we can 'blast' the permeate and
+  retentate pipes.  This should not be done when the pipework is
+  connected to site as cleaning chemicals would be sent down the
+  permeate and retentate lines.</p>
+
+  <p>Specify the time at which the blasting begins.  The permeate line
+  should be opened first.  They will be closed at the end of the
+  recirculating state.</p>
+
+  <label for="permeateBlastTime">Permeate blast time:</label>
+  <input name="permeateBlastTime" id="permeateBlastTime" type="text">
+
+  <label for="retentateBlastTime">Retentate blast time:</label>
+  <input name="retentateBlastTime" id="retentateBlastTime" type="text">
 
 <h2>Concentrating</h2>
 
@@ -235,6 +252,9 @@ by sending permeate and rentate off to site.</p>
 
   <label for="faultMaxBackPressure">Maximum back pressure (bar):</label>
   <input name="faultMaxBackPressure" id="faultMaxBackPressure" type="text">
+
+  <label for="faultMaxBagFilterPressure">Maximum bag filter pressure drop (bar):</label>
+  <input name="faultMaxBagFilterPressure" id="faultMaxBagFilterPressure" type="text">
 
   <label for="faultMinTemp">Minimum temperature (&deg;C):</label>
   <input name="faultMinTemp" id="faultMinTemp" type="text">

@@ -141,29 +141,7 @@ var configurePID = function() {
     }
 
 
-    function onChangeController() {
-        // Hide the controller details until they've arrived from the server
-        $("#ConfigurePID_ContainerGraph").hide();
-        $("#ConfigurePID_ContainerControllerDetails").hide();
-
-        // Get the selected controller
-        var value = $("#ConfigurePID_Controller").val();
-        controller = controllers[value];
-
-        // Close the current eventsource if it's open
-        if (isDefined(eventSource)) eventSource.close();
-
-        // Remove the old data
-        pointsPV.length = 0;
-        pointsSP.length = 0;
-        pointsCV.length = 0;
-
-        // Open new eventsource
-        eventSource = openEventSource(controller);
-        eventSource.onmessage = onMessageEventSource;
-        eventSource.onopen = onOpenEventSource;
-
-        // Get controller details
+    function getControllerDetails() {
         $.ajax( {
             url: "read?obj="+controller.id,
             type: "GET"
@@ -210,9 +188,11 @@ var configurePID = function() {
                 $("#ConfigurePID_RampRate").val(data.config.rampRate);
                 $("#ConfigurePID_RampMaxError").val(data.config.rampMaxErr);
                 if (data.status.modeSpRamp) {
+                    alert("Ramping is engaged");
                     $("#ConfigurePID_SetpointRampingBtn").attr("checked",true).checkboxradio("refresh");
                     $("#ConfigurePID_ContainerRamping").show();
                 } else {
+                    alert("Ramping is disengaged");
                     $("#ConfigurePID_ImmediateSetpointChangesBtn").attr("checked",true).checkboxradio("refresh");
                     $("#ConfigurePID_ContainerRamping").hide();
                 }
@@ -222,7 +202,33 @@ var configurePID = function() {
             .fail( function(data) {
                 showError("Error","Failed to get controller details.  Are you still connected to HOF3?");
             });
+    }
 
+
+    function onChangeController() {
+        // Hide the controller details until they've arrived from the server
+        $("#ConfigurePID_ContainerGraph").hide();
+        $("#ConfigurePID_ContainerControllerDetails").hide();
+
+        // Get the selected controller
+        var value = $("#ConfigurePID_Controller").val();
+        controller = controllers[value];
+
+        // Close the current eventsource if it's open
+        if (isDefined(eventSource)) eventSource.close();
+
+        // Remove the old data
+        pointsPV.length = 0;
+        pointsSP.length = 0;
+        pointsCV.length = 0;
+
+        // Open new eventsource
+        eventSource = openEventSource(controller);
+        eventSource.onmessage = onMessageEventSource;
+        eventSource.onopen = onOpenEventSource;
+
+        // Get controller details
+        getControllerDetails();
     }
 
 
@@ -431,7 +437,7 @@ var configurePID = function() {
     // Interface: Manual PID button
     function onClickManualPIDBtn() {
         $("#ConfigurePID_ContainerNewSetPoint").show();
-        $("#ConfigurePID_ContainerNewRampTarget").hide();
+        $("#ConfigurePID_ContainerNewRampTarget").show();
         $("#ConfigurePID_ContainerNewOutput").hide();
 
         writeCommand("manual");
@@ -533,7 +539,23 @@ var configurePID = function() {
         writeValue(variableID, setpoint);
     }
 
-    // Interface: Setpoint value
+    // Interface: Ramp target value
+    function onChangeRampTarget() {
+        // Disable input
+        $("#ConfigurePID_NewSetPoint").textinput("disable");
+        $("#ConfigurePID_NewRampTarget").textinput("disable");
+        $("#ConfigurePID_NewOutput").textinput("disable");
+
+        // Get value
+        var target = $("#ConfigurePID_NewRampTarget").val()
+
+        // Send command
+        var variableID = controller.id+".vars.rampTarget";
+        writeValue(variableID, target);
+    }
+
+
+    // Interface: control variable value
     function onChangeOutput() {
         // Disable input
         $("#ConfigurePID_NewSetPoint").textinput("disable");
@@ -582,13 +604,43 @@ var configurePID = function() {
 
     // Interface: Setpoint ramping
     function onClickSetpointRampingBtn() {
+        var value = "rampingOn";
+        var variableID = controller.id;
+        write(variableID, value);
+
         $("#ConfigurePID_ContainerRamping").show();
     }
 
     // Interface: Setpoint ramping
     function onClickImmediateSetpointChangesBtn() {
+        var value = "rampingOff";
+        var variableID = controller.id;
+        write(variableID, value);
+
         $("#ConfigurePID_ContainerRamping").hide();
     }
+
+
+    // Interface: ramp rate value
+    function onChangeRampRate() {
+        // Get value
+        var value = $("#ConfigurePID_RampRate").val()
+        var variableID = controller.id+".config.rampRate";
+
+        // Send command
+        write(variableID, value);
+    }
+
+    // Interface: max error value
+    function onChangeRampMaxError() {
+        // Get value
+        var value = $("#ConfigurePID_RampMaxError").val()
+        var variableID = controller.id+".config.rampMaxErr";
+
+        // Send command
+        write(variableID, value);
+    }
+
 
 
     function pageInit(event) {
@@ -610,6 +662,7 @@ var configurePID = function() {
 
         $("#ConfigurePID_NewOutput").change(onChangeOutput);
         $("#ConfigurePID_NewSetPoint").change(onChangeSetPoint);
+        $("#ConfigurePID_NewRampTarget").change(onChangeRampTarget);
 
         $("#ConfigurePID_p").change(onChangeP);
         $("#ConfigurePID_i").change(onChangeI);
@@ -617,6 +670,9 @@ var configurePID = function() {
 
         $("#ConfigurePID_SetpointRampingBtn").click(onClickSetpointRampingBtn);
         $("#ConfigurePID_ImmediateSetpointChangesBtn").click(onClickImmediateSetpointChangesBtn);
+
+        $("#ConfigurePID_RampRate").change(onChangeRampRate);
+        $("#ConfigurePID_RampMaxError").change(onChangeRampMaxError);
     }
 
 

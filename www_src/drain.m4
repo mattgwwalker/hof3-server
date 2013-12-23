@@ -1,6 +1,19 @@
 include(`m4/header.m4')dnl
 htmlHeader(`Draining',`Drain_Page')
 
+<h2>Target</h2>
+
+<p>Draining can be either to waste to to the storage tank.</p>
+
+  <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
+    <legend>Target:</legend>
+    <label><input type="radio" name="target" value="waste" checked="checked"/>
+      Waste</label>
+    <label><input type="radio" name="target" value="store"/>
+      Storage Tank</label>
+  </fieldset>
+
+
 <h2>Draining</h2>
 
 <p>This value applies to both the Pump to drain state and the Passive drain state.</p>

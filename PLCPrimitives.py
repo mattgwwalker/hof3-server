@@ -67,16 +67,19 @@ class PLCTime(PLCPrimitive):
             if None in data:
                 # At least one of the items doesn't have valid data:
                 return None
+
             if len(data) == 7:
                 print "data:",data
                 # Take data with hundredths and convert it to standard y-m-d-h-m-s.
-                seconds = int(data[5])+(int(data[6])/100.0)
-                data = list(data[0:5])+[seconds,]
-            assert len(data) == 6
+                microseconds = (int(data[6])/100.0) * 1000000
+                data = list(data[0:6])+[microseconds,]
 
-            data[0] = "20"+data[0]            # convert two-digit to four-digit year
+            assert len(data) >= 6
+
             data = [int(i) for i in data]     # convert to ints
+            data[0] = 2000+data[0]            # convert two-digit to four-digit year
             try:
+                print data
                 return datetime.datetime( *data ) # convert to datetime
             except:
                 return None
@@ -372,7 +375,7 @@ class PLCFixed(PLCPrimitive):
             assert data != "" # If this happens then you've probably got the wrong memory address
             if data is None or data[0] == '\0':
                 return None
-            return int(data)/float(self.scaleFactor)
+            return float(data)/float(self.scaleFactor)
         d.addCallback( onResult )
         return d
 

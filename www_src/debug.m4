@@ -12,7 +12,8 @@ htmlHeader(`Debug',`Debug_Page')
 <h2>Current plant status</h2>
 <ul>
   <li>State: <span id="Debug_State"></span></li>
-  <li>Contents: <span id="Debug_Contents"></span></li>
+  <li>Feed tank: <span id="Debug_FeedTankStatus"></span></li>
+  <li>Storage tank: <span id="Debug_StorageTankStatus"></span></li>
 </ul>
 
 <button id="Debug_AcknowledgeBtn" data-theme="b">Acknowledge End of Process</button>
@@ -23,10 +24,19 @@ htmlHeader(`Debug',`Debug_Page')
 
 <h2>Messages</h2>
 <ul>
-  <li>Production: <span id="Debug_ProductionSelectionMessage"></span></li>
-  <li>CIP: <span id="Debug_CIPSelectionMessage"></span></li>
-  <li>Rinse: <span id="Debug_RinseSelectionMessage"></span></li>
+  <li><b>Run:</b></li>
+  <ul>
+    <li>Site: <span id="Debug_RunSiteSelectionMessage"></span></li>
+    <li>None: <span id="Debug_RunNoneSelectionMessage"></span></li>
+    <li>Auto-chem: <span id="Debug_RunAutoChemSelectionMessage"></span></li>
+    <li>Water: <span id="Debug_RunWaterSelectionMessage"></span></li>
+    <li>Storage tank: <span id="Debug_RunStoreSelectionMessage"></span></li>
+  </ul>
+  <li>Send to waste: <span id="Debug_WasteSelectionMessage"></span></li>
+  <li>Send to storage tank: <span id="Debug_StoreSelectionMessage"></span></li>
+  <li>Storage tank to waste: <span id="Debug_StoreToWasteSelectionMessage"></span></li>
   <li>Fault: <span id="Debug_FaultMessage"></span></li>
+  
 </ul>
 
 <button id="Debug_DisableFaultsBtn" data-theme="b">Disable fault monitoring</button>
@@ -78,10 +88,10 @@ htmlHeader(`Debug',`Debug_Page')
 <h3>Backwashes</h3>
 <ul>
   <li>Backwash frequency: <span id="Debug_BackwashTime"></span></li>
-  <li>Backwash frequency timer is the same as for the direction change timer</li>
+  <li>Backwash frequency timer: <span id="Debug_BackwashFreqTimer"></span></li>
   <li>Backwash duration (when direction is from the top): <span id="Debug_BackwashTopTime"></span></li>
   <li>Backwash duration (when direction is from the bottom): <span id="Debug_BackwashBottomTime"></span></li>
-  <li>Backwash duration timer: <span id="Debug_BackwashTimer"></span></li>
+  <li>Backwash duration timer uses step timer.</li>
 </ul>
 
 

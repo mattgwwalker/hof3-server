@@ -4,7 +4,36 @@
 
 <h2>Things to fix with PLC code:</h2>
 <ul>
-  <li>Why does E-Stop change the position of DV07 and DV08?</li>
+  <li>Add "blast" state at the end of recirc, used for cleaning.  We
+  cycle through the permeate and retentate lines and just open each up
+  completely one after the other.  This state will not be used during
+  real production.</li>
+
+  <li>Fix PT01 reads 0.56 bar and gives 0.5 bar signal.</li>
+
+  <li>Auto-chem dosing with pH control</li>
+ 
+  <li>Drain to waste function for storage tank.</li>
+
+  <li>DONE Add storage tank pre-selection check.  Change 'production' to
+  'site'.  All these messages </li>
+
+  <li>DONE Add fault checking for drain-to-storage-tank.  Check if the
+  contents are compatible.</li>
+
+  <li>DONE How the storage tank pump works.  Why does it come on when the
+  level's at target?  It should be used to fill the feed tank, and
+  then if more product is required, the machine should be shut down.
+  A function to fill the feedtank from the storage tank would be
+  useful.</li>
+
+  <li>FOR RPI Cleaning: The storage tank needs a cleaning algorithm.
+  Including pumping back up and draining the storage tank to
+  waste.</li>
+
+  <li>Why does E-Stop change the position of DV07 and DV08?  Because
+  of the way the valves are wired.  They'd need an inverted signal to
+  the one we're providing.</li>
 
   <li>Add setpoint ramping to PC01</li>
 

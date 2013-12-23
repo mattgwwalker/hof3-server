@@ -17,15 +17,24 @@ class Logger(Resource):
         self.plc = plc
         self.root = Root(plc)
         self.lastReadPtr = None
+        self.firstLine = True
 
     def processEvent(self, request):
-        request.write("\nprocessing event\n")
-
         def readLog():
             d = self.root.getChild("hof3.log")
             def onResult(data):
                 self.lastReadPtr = data["hof3"]["log"]["readPtr"]
-                request.write(str(data["hof3"]["log"])+"\n")
+                data = data["hof3"]["log"]
+
+                if self.firstLine:
+                    self.firstLine = False
+                    line = ",".join([str(x) for x in data.keys()])
+                    request.write(line+"\n")
+                    
+                if data["readPtr"] != 0:
+                    line = ",".join([str(x) for x in data.values()])
+                    request.write(line+"\n")
+
                 return data
             d.addCallback(onResult)        
             return d
@@ -35,8 +44,8 @@ class Logger(Resource):
             d = self.root.getChild("hof3.log.writePtr")
             def onResult(data):
                 writePtr = data["hof3"]["log"]["writePtr"]
-                if writePtr > self.lastReadPtr:
-                    request.write("\n\nwritePtr:"+str(writePtr)+" self.lastReadPtr:"+str(self.lastReadPtr))
+                if writePtr != self.lastReadPtr:
+                    #request.write("\n\nwritePtr:"+str(writePtr)+" self.lastReadPtr:"+str(self.lastReadPtr))
                     return readLog()
                 else:
                     return False
@@ -57,9 +66,8 @@ class Logger(Resource):
     def render_GET(self, request):
         print "Received GET request for Logger"
         request.setHeader("Content-Type","text/plain")
-        request.write("This is the logger.\n")
 
-        freq = 1.0 # Repeat every 1 seconds
+        freq = 0.5 # Repeat every 1 seconds
 
         loop = task.LoopingCall( lambda: self.processEvent(request) )
         loop.start(freq) 

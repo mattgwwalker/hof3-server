@@ -1,6 +1,7 @@
 // Start up event source that queries the fault message associated with 'production'.
 var production = function() {
     var eventSource;
+    var membraneMaxInletPressure;
 
     function openEventSource() {
         var address = "/events?obj=hof3.checkAuto,hof3.productionSelectionMsg,hof3.stepNum";
@@ -98,6 +99,7 @@ $("#Production_StartBtn").button("enable");
         var faultMaxTransMembranePressure = $('input[name=faultMaxTransMembranePressure]').val();
         var faultMaxAlongMembranePressure = $('input[name=faultMaxAlongMembranePressure]').val();
         var faultMaxBackPressure = $('input[name=faultMaxBackPressure]').val();
+        var faultMaxBagFilterPressure = $('input[name=faultMaxBagFilterPressure]').val();
         var faultMinTemp = $('input[name=faultMinTemp]').val();
         var faultMaxTemp = $('input[name=faultMaxTemp]').val();
         var faultMinPH = $('input[name=faultMinPH]').val();
@@ -124,6 +126,7 @@ $("#Production_StartBtn").button("enable");
                     "hof3.dpc01.outputs.mix" : mixPressure,
 
                     "hof3.membraneUseTimeSP" : membraneUseTime,
+                    "hof3.pc01.setpoints.membraneMaxInletPressure": membraneMaxInletPressure,
                     "hof3.dpc01.setpoints.recirc" : alongMembranePressure,
                     "hof3.pc05.setpoints.prod" : transMembranePressure,
                     "hof3.pc03.setpoints.prod" : backwashPressure,
@@ -149,6 +152,7 @@ $("#Production_StartBtn").button("enable");
                     "hof3.faultMaxTransMembranePressure" : faultMaxTransMembranePressure,
                     "hof3.faultMaxAlongMembranePressure" : faultMaxAlongMembranePressure,
                     "hof3.faultMaxBackPressure" : faultMaxBackPressure,
+                    "hof3.faultMaxBagFilterPressure" : faultMaxBagFilterPressure,
                     "hof3.faultMinTemp" : faultMinTemp,
                     "hof3.faultMaxTemp" : faultMaxTemp,
                     "hof3.faultMinPH" : faultMinPH,
@@ -157,7 +161,7 @@ $("#Production_StartBtn").button("enable");
                     "hof3.logFreq" : logFreq,
                     "hof3.logBackwashDetail" : logBackwashDetail,
 
-                    "hof3.command" : "recirc"
+                    "hof3.command" : "run"
                   }
         })
             .done( function(data) {
@@ -169,10 +173,19 @@ $("#Production_StartBtn").button("enable");
     }
 
 
-    var membraneMaxInletPressure;
-    function onChangeMixPressure() {
+    function updateMixPressure() {
         var percentage = $('input[name=mixPressure]').val();
         $('#mixPressureInBar').html(Math.round(membraneMaxInletPressure*percentage)/100);
+    }
+
+    function onChangeMixPressure() {
+        updateMixPressure();
+    }
+
+    function onChangeMembraneMaxInletPressure() {
+        membraneMaxInletPressure = parseFloat($("input[name=membraneMaxInletPressure]").val());
+        $("#membraneMaxInletPressure").html(membraneMaxInletPressure);
+        updateMixPressure();
     }
 
 
@@ -180,7 +193,7 @@ $("#Production_StartBtn").button("enable");
         //$("#Production_MainContainer").hide();
         $.mobile.loading( 'show', { text: "Loading current settings", textVisible: true });
         $.ajax( {
-            url: "read?obj=hof3.fillSource,hof3.fillLevel,hof3.fillLevelHysteresis,hof3.startLevel,hof3.chemicalDoseSP,hof3.desiredTemp,hof3.mixTimeSP,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.dpc01.outputs.mix,hof3.membraneUseTimeSP,hof3.dpc01.setpoints.recirc,hof3.pc05.setpoints.prod,hof3.pc03.setpoints.prod,hof3.pc03.outputs.start,hof3.backwashTimeSP,hof3.recircTimeSP,hof3.rc01.setpoints.prod,hof3.endLevel,hof3.emptyLevel,hof3.drainDirectionChangeTimeSP,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.directionChangeTimeSP,hof3.faultMaxInletPressure,hof3.faultMaxTransMembranePressure,hof3.faultMaxAlongMembranePressure,hof3.faultMaxBackPressure,hof3.faultMinTemp,hof3.faultMaxTemp,hof3.faultMinPH,hof3.faultMaxPH,hof3.logFreq",
+            url: "read?obj=hof3.fillSource,hof3.fillLevel,hof3.fillLevelHysteresis,hof3.startLevel,hof3.chemicalDoseSP,hof3.desiredTemp,hof3.mixTimeSP,hof3.pc01.setpoints.membraneMaxInletPressure,hof3.dpc01.outputs.mix,hof3.membraneUseTimeSP,hof3.dpc01.setpoints.recirc,hof3.pc05.setpoints.prod,hof3.pc03.setpoints.prod,hof3.pc03.outputs.start,hof3.backwashTimeSP,hof3.recircTimeSP,hof3.rc01.setpoints.prod,hof3.endLevel,hof3.emptyLevel,hof3.drainDirectionChangeTimeSP,hof3.pc01.outputs.drain,hof3.drainTimeSP,hof3.directionChangeTimeSP,hof3.faultMaxInletPressure,hof3.faultMaxTransMembranePressure,hof3.faultMaxAlongMembranePressure,hof3.faultMaxBackPressure,hof3.faultMaxBagFilterPressure,hof3.faultMinTemp,hof3.faultMaxTemp,hof3.faultMinPH,hof3.faultMaxPH,hof3.logFreq",
             type: "GET"
         })
             .done( function(data) {
@@ -201,6 +214,7 @@ $("#Production_StartBtn").button("enable");
                 onChangeMixPressure();
 
                 $('input[name=membraneUseTime]').val(data.hof3.membraneUseTimeSP);
+                $('input[name=membraneMaxInletPressure]').val(membraneMaxInletPressure);
                 $('input[name=alongMembranePressure]').val(data.hof3.dpc01.setpoints.recirc);
                 $('input[name=transMembranePressure]').val(data.hof3.pc05.setpoints.prod);
                 $('input[name=backwashPressure]').val(data.hof3.pc03.setpoints.prod);
@@ -228,6 +242,8 @@ $("#Production_StartBtn").button("enable");
                 $('input[name=faultMaxTransMembranePressure]').val(data.hof3.faultMaxTransMembranePressure);
                 $('input[name=faultMaxAlongMembranePressure]').val(data.hof3.faultMaxAlongMembranePressure);
                 $('input[name=faultMaxBackPressure]').val(data.hof3.faultMaxBackPressure);
+                $('input[name=faultMaxBagFilterPressure]').val(data.hof3.faultMaxBagFilterPressure);
+
                 $('input[name=faultMinTemp]').val(data.hof3.faultMinTemp);
                 $('input[name=faultMaxTemp]').val(data.hof3.faultMaxTemp);
                 $('input[name=faultMinPH]').val(data.hof3.faultMinPH);
@@ -249,6 +265,7 @@ $("#Production_StartBtn").button("enable");
     function pageInit(event) {
         $("#Production_StartBtn").click(onClickStartBtn);
         $('input[name=mixPressure]').change(onChangeMixPressure);
+        $('input[name=membraneMaxInletPressure]').change(onChangeMembraneMaxInletPressure);
     }
 
     function pageShow(event) {
