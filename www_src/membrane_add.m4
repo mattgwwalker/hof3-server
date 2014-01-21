@@ -3,11 +3,10 @@ htmlHeader(`Add New Membrane',`AddNewMembrane_Page')
 
 <p>Membranes are referred to with a name.  The name should be written
 on the membrane itself to help in its identification and the name
-needs to be unique.</p>
-
-<p>Even if the membrane is an exact duplicate of another, it should be
-given a different name.  This is because a membrane's usage and
-cleaning histories will impact its performance.</p>
+needs to be unique.  Even if the membrane is an exact duplicate of
+another, it should be given a different name.  This is because a
+membrane's usage and cleaning histories will impact its
+performance.</p>
 
 <p>The description may contain anything you wish.  It may be useful to
 include details for re-ordering and note important events in the
@@ -62,6 +61,10 @@ membrane during use.</p>
 </form>
 
   <fieldset class="ui-grid-a">
+    <div class="ui-block-a">
+      <a href="index.php" data-theme="a" data-rel="back" data-role="button">
+        Cancel</a>
+    </div>
     <div class="ui-block-b">
       <button data-theme="b" id="AddNewMembrane_AddMembraneBtn">
         Add Membrane</button>
