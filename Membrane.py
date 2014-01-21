@@ -56,7 +56,7 @@ class Membrane(Resource):
             error = None
             if len(name) < 1:
                 error = "A name must be provided"
-            if mwco < 0:
+            if mwco <= 0:
                 error = "Molecular weight cut-off (MWCO) must be positive"
             if (maxInletPressure < 0 
                 or maxAlongMembranePressure < 0 

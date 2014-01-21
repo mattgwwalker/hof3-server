@@ -4,19 +4,18 @@ htmlHeader(`Add New Membrane',`AddNewMembrane_Page')
 <p>Membranes are referred to with a name.  The name should be written
 on the membrane itself to help in its identification and the name
 needs to be unique.  Even if the membrane is an exact duplicate of
-another, it should be given a different name.  This is because a
-membrane's usage and cleaning histories will impact its
-performance.</p>
+another, they should not be considered identical and they should be
+given a different names.  This is because a membrane's usage and
+cleaning histories will impact its performance.</p>
 
 <p>The description may contain anything you wish.  It may be useful to
 include details for re-ordering and note important events in the
 membrane's life.</p>
 
-<p>The molecular weight cut off should have been supplied by the
-manufactuer along with running conditions for the membrane.  Copy
-these figures into the appropriate fields below.  The running
-conditions will be used to set fault conditions that protect the
-membrane during use.</p>
+<p>The molecular weight cut off and running conditions should have
+been supplied by the manufactuer of the membrane.  Copy these figures
+into the appropriate fields below.  The running conditions will be
+used to set fault conditions that protect the membrane during use.</p>
 
 
 <form id="AddNewMembrane_Form">
