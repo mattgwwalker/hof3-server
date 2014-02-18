@@ -23,18 +23,26 @@ CREATE TABLE Membranes (
 );
 
 
-
-
-
-
 CREATE TABLE Products (
   ProductID INTEGER PRIMARY KEY,
-  Retired BOOLEAN NOT NULL DEFAULT 0,
   Name TEXT NOT NULL UNIQUE,
   Description TEXT,
   MinTemperature REAL,           -- degrees C
-  MaxTemperature REAL            -- degrees C
+  MaxTemperature REAL,           -- degrees C
+  Retired BOOLEAN NOT NULL DEFAULT 0
 );
+
+
+
+CREATE TABLE Runs (
+  RunID INTEGER PRIMARY KEY,
+  Description TEXT,
+  MembraneID INTEGER REFERENCES Membranes(MembraneID),
+  BagFilter TEXT,                -- a description of the bag filter in use
+  ProductID INTEGER REFERENCES Products(ProductID)
+);
+
+
 
 CREATE TABLE CleaningChemicals (
   ChemicalID INTEGER PRIMARY KEY,

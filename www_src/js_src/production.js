@@ -1,5 +1,6 @@
 // Start up event source that queries the fault message associated with 'production'.
-var production = function() {
+var interfaceProduction = function() {
+
     var eventSource;
     var membraneMaxInletPressure;
 
@@ -56,6 +57,12 @@ $("#Production_StartBtn").button("enable");
         eventSource = openEventSource();
         eventSource.onmessage = onEventSourceMessage;
     }
+
+
+
+
+
+
 
 
 
@@ -262,10 +269,18 @@ $("#Production_StartBtn").button("enable");
             });
     }
 
+
+
+
+
+
+
     function pageInit(event) {
         $("#Production_StartBtn").click(onClickStartBtn);
         $('input[name=mixPressure]').change(onChangeMixPressure);
         $('input[name=membraneMaxInletPressure]').change(onChangeMembraneMaxInletPressure);
+
+        membranes.populateSelect("#Production_MembraneSelect");
     }
 
     function pageShow(event) {
@@ -283,9 +298,9 @@ $("#Production_StartBtn").button("enable");
 
 
 // Page initialisation event
-$(document).on( "pageinit", "#Production_Page", production.pageInit );
+$(document).on( "pageinit", "#Production_Page", interfaceProduction.pageInit );
 
 
 
 // Page show event
-$(document).on( "pageshow", "#Production_Page", production.pageShow );
+$(document).on( "pageshow", "#Production_Page", interfaceProduction.pageShow );

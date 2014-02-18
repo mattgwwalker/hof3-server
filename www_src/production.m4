@@ -9,7 +9,7 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
 <p>Select the membrane that is currently installed.  A new membrane
 may be added via the <a href="membrane.html">Membrane Page</a>.</p>
 
-<label for="Production_MembraneSelect" class="ui-hidden-accessible">Membrane:</label>
+<label for="Production_MembraneSelect">Membrane:</label>
 <select data-native-menu="false" id="Production_MembraneSelect">
   <option value="">Select the currently installed membrane</option>
 </select>
@@ -17,14 +17,8 @@ may be added via the <a href="membrane.html">Membrane Page</a>.</p>
 
 <h2>Bag Filter</h2>
 
-<p>Select the currently installed bag filter.  A new filter can be
-specified at the Bag Filter Page (TODO).</p>
-
-<label for="Production_BagFilterSelect" class="ui-hidden-accessible">Bag filter:</label>
-<select data-native-menu="false" id="Production_BagFilterSelect">
-  <option value="">Select the currently installed bag filter</option>
-</select>
-
+  <label for="bagFilter">Bag Filter Description:</label>
+  <input name="bagFilter" id="bagFilter" type="text">
 
 <h2>Product</h2>
 

@@ -15,6 +15,7 @@ from Read import Read
 from Write import Write
 
 from Membrane import Membrane
+from Product import Product
 
 # Create connection to PLC
 plc = HOF3Client()
@@ -40,6 +41,7 @@ root.putChild("write", Write(plc))
 root.putChild("read", Read(plc))
 root.putChild("logger", Logger(plc))
 root.putChild("membrane", Membrane())
+root.putChild("product", Product())
 factory = Site(root)
 reactor.listenTCP(8000, factory)
 reactor.run()
