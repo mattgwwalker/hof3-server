@@ -1,128 +1,123 @@
-// *******************************
-// Interface: View / Edit Membrane
-// *******************************
+// ***************************
+// Interface: Add New Membrane
+// ***************************
 
 var interfaceViewEditMembrane = function() {
-    var restartRequired = true;
-
-    function onChangeMembraneSelect() {
-        // Get currently selected membrane ID
-        membraneID = $("#ViewEditMembrane_MembraneSelect").val();
-
-        // Request membrane form for the currently selected membrane
+    function populateSelect() {
+        // Get list of membranes
         $.ajax( {
-            url: "partial/membrane_form.php",
-            type: "GET",
-            data: { "MembraneID": membraneID } 
+            url: "/membrane",
+            type: "GET"
         })
         .done( function(data) {
-            $("#ViewEditMembrane_ContainerMembrane").empty();
-            $("#ViewEditMembrane_ContainerMembrane").html(data).trigger("create");
-            $("#ViewEditMembrane_BtnSaveChanges").button("enable");
-        }).
-        fail( function() {
-            showError("Failed to get partial/membrane_form.php.  Are you still connected to HOF3?");
-        });
-    }
-
-    function onClickBtnSaveChanges() {
-        // Send off form data and wait for response; either stay on page
-        // with an error or head back to the main menu with a message of
-        // success.
-        $.ajax( {
-            url: "partial/membrane_update.php",
-            type: "POST",
-            data: $("#ViewEditMembrane_Form").serialize()
-        })
-        .done( function(result) {
-            var data;
-            try {
-                data = $.parseJSON(result);
-            }
-            catch( e ) {
-                data = {"result": "fail",
-                        "message": "Failed to parse the JSON response; this almost certainly indicates an error.  Response was: "+result};
-            }
-            
-            if (isDefined(data.result) && data.result=="ok") {
-                gMessage = "Membrane successfully updated";
-                $.mobile.changePage("index.php");
-                
-                restartRequired = true;
+            var options = ""
+            if (data.length == 0) {
+                // There aren't any membranes in the database
+                options = "<option>There are no membranes in the database</option>";
             } else {
-                var errorMessage;
-                if (isUndefined(data.message)) errorMessage = "No error message was included.";
-                else errorMessage = data.message;
-                showError("Error", "Failed to update membrane: "+errorMessage);
+                // We have a list of membranes in the database
+                options = "<option>Select a membrane to view or edit</option>";
+                for (var i=0; i<data.length; i++) {
+                    options += "<option value='"+data[i][0]+"'>"+data[i][1]+"</option>";
+                }
             }
+            $("#ViewEditMembrane_Select").html(options).selectmenu("refresh");
         })
         .fail( function(data) {
-            showError("Error", "Failed to update membrane; could not send data.  Are you still connected to HOF3?");
+            showError("Error", "Failed to obtain the list of membranes from the database.  Are you still connected to HOF3?");
         });
         return false; // Stops default handler from being called
     }
 
 
-    function restartPage() {
+
+    function loadMembrane(membraneID) {
+        // Get membrane detail
         $.ajax( {
-            url: "partial/membrane_select.php",
+            url: "/membrane",
             type: "GET",
-            data: {"ID": "ViewEditMembrane_MembraneSelect"}
+            data: { "membraneID" : membraneID } 
+        })
+            .done( function(data) {
+                $("#ViewEditMembrane_MembraneID").val(data["MembraneID"]);
+                $("#ViewEditMembrane_Name").val(data["Name"]);
+                $("#ViewEditMembrane_Description").val(data["Description"]);
+                $("#ViewEditMembrane_MWCO").val(data["MWCO"]);
+                $("#ViewEditMembrane_Retired").prop("checked",parseInt(data["Retired"])==1).checkboxradio("refresh");
+                $("#ViewEditMembrane_MaxInletPressure").val(data["MaxInletPressure"]);
+                $("#ViewEditMembrane_MaxAlongMembranePressure").val(data["MaxAlongMembranePressure"]);
+                $("#ViewEditMembrane_MaxTransMembranePressure").val(data["MaxTransMembranePressure"]);
+                $("#ViewEditMembrane_MaxBackPressure").val(data["MaxBackPressure"]);
+                $("#ViewEditMembrane_MinTemperature").val(data["MinTemperature"]);
+                $("#ViewEditMembrane_MaxTemperature").val(data["MaxTemperature"]);
+                $("#ViewEditMembrane_MinPH").val(data["MinPH"]);
+                $("#ViewEditMembrane_MaxPH").val(data["MaxPH"]);
+                $("#ViewEditMembrane_Form").show();
+            })
+            .fail( function(data) {
+                showError("Error", "Failed to obtain the membrane's detail from the database.  Are you still connected to HOF3?");
+            });
+    }
+
+
+    function sendUpdateToServer() {
+        // Send off form data and wait for response; either stay on page
+        // with an error or head back to the main menu with a message of
+        // success.
+        $.ajax( {
+            url: "/membrane",
+            type: "POST",
+            data: $("#ViewEditMembrane_Form").serialize()
         })
         .done( function(data) {
-            // Get select control and remove previously displayed data
-            $("#ViewEditMembrane_ContainerMembraneSelect").html(data).trigger("create");
-            $("#ViewEditMembrane_MembraneSelect").change( onChangeMembraneSelect );
-            $("#ViewEditMembrane_ContainerMembrane").empty();
-            $("#ViewEditMembrane_BtnSaveChanges").button("disable");
-            restartRequired = false;
+            if (isDefined(data.result) && data.result=="ok") {
+                gMessage = "Membrane edited successfully";
+                $.mobile.changePage("index.html");
+            } else {
+                var errorMessage;
+                if (isUndefined(data.message)) errorMessage = "No error message was included."
+                else errorMessage = data.message;
+                showError("Error", errorMessage);
+            }
         })
         .fail( function(data) {
-            showError("Failed to obtain the list of membranes.  Are you still connected to HOF3?");
+            showError("Error", "Failed to edit membrane in database; could not send data.  Are you still connected to HOF3?");
         });
+        return false; // Stops default handler from being called
     }
 
-    function setRestartRequired() {
-        restartRequired = true;
+
+
+
+    function onChangeSelect() {
+        membraneID = $("#ViewEditMembrane_Select").val();
+        loadMembrane(membraneID);
     }
 
-    function restartPageIfRequired() {
-        if (restartRequired) {
-            restartPage();
-        }
+
+    function pageInit() {
+        $("#ViewEditMembrane_Select").change(onChangeSelect);
+        $("#ViewEditMembrane_SaveChangesBtn").click(sendUpdateToServer);
     }
+
+
+    function pageShow() {
+        $("#ViewEditMembrane_Form").hide();
+        populateSelect();
+    }
+
 
     return {
-        onChangeMembraneSelect: onChangeMembraneSelect,
-        onClickBtnSaveChanges: onClickBtnSaveChanges,
-        restartPage: restartPage,
-        restartPageIfRequired: restartPageIfRequired,
-        setRestartRequired: setRestartRequired
+        pageInit: pageInit,
+        pageShow: pageShow,
+        loadMembrane: loadMembrane
     };
 
 }();
 
 
+// Page init event
+$(document).on( "pageinit", "#ViewEditMembrane_Page", interfaceViewEditMembrane.pageInit);
 
-// Page initialisation event
-$(document).on( "pageinit", "#ViewEditMembrane_Page", function(event) {
-    interfaceViewEditMembrane.setRestartRequired();
-
-    $("#ViewEditMembrane_BtnSaveChanges").click( interfaceViewEditMembrane.onClickBtnSaveChanges );
-    $("#ViewEditMembrane_BtnCancel").click( interfaceViewEditMembrane.setRestartRequired );
-    $("#ViewEditMembrane_MembraneSelect").change( interfaceViewEditMembrane.onChangeMembraneSelect );
-});
-
-// Page before show event
-$(document).on( "pagebeforeshow", "#ViewEditMembrane_Page", function(event) {
-    // The page cannot be restarted on every pagebeforeshow event
-    // because the custom select can popup a dialog if the list is too
-    // long.  If the list is long, that dialog is treated as a new
-    // page; thus when the user selects an item from the list and is
-    // returned to the View/Edit Membrane form, the form sees a
-    // pagebefore show event.
-
-    interfaceViewEditMembrane.restartPageIfRequired();
-});
-
-
+// Page show event
+$(document).on( "pageshow", "#ViewEditMembrane_Page", interfaceViewEditMembrane.pageShow);
