@@ -3,6 +3,8 @@
 // ***************************
 
 var interfaceViewEditMembrane = function() {
+    var restartRequired = true;
+
     function populateSelect() {
         // Get list of membranes
         $.ajax( {
@@ -22,6 +24,7 @@ var interfaceViewEditMembrane = function() {
                 }
             }
             $("#ViewEditMembrane_Select").html(options).selectmenu("refresh");
+            restartRequired = false;
         })
         .fail( function(data) {
             showError("Error", "Failed to obtain the list of membranes from the database.  Are you still connected to HOF3?");
@@ -64,6 +67,7 @@ var interfaceViewEditMembrane = function() {
         // Send off form data and wait for response; either stay on page
         // with an error or head back to the main menu with a message of
         // success.
+        restartRequired = true;
         $.ajax( {
             url: "/membrane",
             type: "POST",
@@ -102,8 +106,11 @@ var interfaceViewEditMembrane = function() {
 
 
     function pageShow() {
-        $("#ViewEditMembrane_Form").hide();
-        populateSelect();
+        if (restartRequired) {
+            console.log("restart required, populating select");
+            $("#ViewEditMembrane_Form").hide();
+            populateSelect();
+        }
     }
 
 

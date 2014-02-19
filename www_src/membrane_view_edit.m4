@@ -24,7 +24,7 @@ experiments.  Retiring a membrane will not impact the data of previous
 experiments as the membrane's details will still be available.</p>
 
 <label for="ViewEditMembrane_Select">Membrane to view or edit:</label>
-<select id="ViewEditMembrane_Select" data-native-menu="true">
+<select id="ViewEditMembrane_Select" data-native-menu="false">
   <option>Select a membrane to view or edit</option>
 </select>
 
