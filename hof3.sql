@@ -44,14 +44,14 @@ CREATE TABLE Runs (
 
 
 
-CREATE TABLE CleaningChemicals (
+CREATE TABLE Chemicals (
   ChemicalID INTEGER PRIMARY KEY,
   Retired BOOLEAN NOT NULL DEFAULT 0,
   Name TEXT NOT NULL UNIQUE,
   Description TEXT,
   MinTemperature REAL,           -- degrees C
   MaxTemperature REAL,           -- degrees C
-  DosedManually BOOLEAN NOT NULL -- true if the chemcial is added over the edge of the tank
+  DosedManually BOOLEAN NOT NULL -- true if the chemcial is added by the user
 );
 
 CREATE TABLE CleaningRegimes (
