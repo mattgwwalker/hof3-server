@@ -193,7 +193,7 @@ class Product(Resource):
                 if cursor.fetchone() is None:
                     raise Exception("The ProductID '"+str(args["productID"])+"' does not exist in the database")
                 print "attempting to update db"
-                cursor.execute("UPDATE Products SET Name=?, Description=?, MWCO=?, Retired=?, MaxInletPressure=?, MaxAlongProductPressure=?, MaxTransProductPressure=?, MaxBackPressure=?, MinTemperature=?, MaxTemperature=?, MinPH=?, MaxPH=? WHERE ProductID = ?", (args["name"], args["description"], args["mwco"], args["retired"], args["maxInletPressure"], args["maxAlongProductPressure"], args["maxTransProductPressure"], args["maxBackPressure"], args["minTemperature"], args["maxTemperature"], args["minPH"], args["maxPH"], args["productID"]))
+                cursor.execute("UPDATE Products SET Name=?, Description=?, Retired=?, MinTemperature=?, MaxTemperature=? WHERE ProductID = ?", (args["name"], args["description"], args["retired"], args["minTemperature"], args["maxTemperature"], args["productID"]))
             
 
             print "calling writeToDatabase"
