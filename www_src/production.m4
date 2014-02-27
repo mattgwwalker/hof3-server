@@ -7,7 +7,7 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
 <h2>Membrane</h2>
 
 <p>Select the membrane that is currently installed.  A new membrane
-may be added via the <a href="membrane.html">Membrane Page</a>.</p>
+may be added via the <a href="membrane_add.html">Add Membrane Page</a>.</p>
 
 <label for="Production_MembraneSelect">Membrane:</label>
 <select data-native-menu="false" id="Production_MembraneSelect">
@@ -17,13 +17,15 @@ may be added via the <a href="membrane.html">Membrane Page</a>.</p>
 
 <h2>Bag Filter</h2>
 
-  <label for="bagFilter">Bag Filter Description:</label>
-  <input name="bagFilter" id="bagFilter" type="text">
+<p>Describe the bag filter currently installed.</p>
+
+  <label for="Production_BagFilter">Bag Filter Description:</label>
+  <input name="BagFilter" id="Production_BagFilter" type="text">
 
 <h2>Product</h2>
 
 <p>Select the product that you're using.  Add a new product via the
-Product Page (TODO).</p>
+<a href="product_add.html">Add Product Page</a>.</p>
 
 <label for="Production_ProductSelect" class="ui-hidden-accessible">Product:</label>
 <select data-native-menu="false" id="Production_ProductSelect">
@@ -34,20 +36,20 @@ Product Page (TODO).</p>
 
 <p>Select the chemical that's in the rig's chemical tank.  It is this
 chemical that will be used for automatic dosing calculations.  Add a
-new entry via the Chemicals Page (TODO).</p>
+new entry via the <a href="chemcial_add.html">Add Chemical Page</a>.</p>
 
 <label for="Production_AutoChemicalSelect" class="ui-hidden-accessible">Auto chemical:</label>
 <select data-native-menu="false" id="Production_AutoChemicalSelect">
   <option value="">Select the chemical currently in the rig's chemical tank</option>
 </select>
 
-<h2>Custom Chemical</h2>
+<h2>Manual Chemical</h2>
 
 <p>Select the chemical that you're using.  Add a new entry via the
 Chemicals Page (TODO).</p>
 
-<label for="Production_CustomChemicalSelect" class="ui-hidden-accessible">Custom Chemical:</label>
-<select data-native-menu="false" id="Production_CustomChemicalSelect">
+<label for="Production_ManualChemicalSelect" class="ui-hidden-accessible">Manual Chemical:</label>
+<select data-native-menu="false" id="Production_ManualChemicalSelect">
   <option value="">Select the chemical currently in use</option>
 </select>
 

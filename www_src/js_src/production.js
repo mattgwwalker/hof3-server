@@ -270,17 +270,17 @@ $("#Production_StartBtn").button("enable");
     }
 
 
-
-
-
-
-
     function pageInit(event) {
         $("#Production_StartBtn").click(onClickStartBtn);
         $('input[name=mixPressure]').change(onChangeMixPressure);
         $('input[name=membraneMaxInletPressure]').change(onChangeMembraneMaxInletPressure);
 
-        membranes.populateSelect("#Production_MembraneSelect");
+        membranes.populateSelect("#Production_MembraneSelect", "Select installed membrane");
+        products.populateSelect("#Production_ProductSelect", "Select feed product");
+        chemicals.populateSelect("#Production_AutoChemicalSelect", "Select chemical for automatic dosing", false);
+        chemicals.populateSelect("#Production_ManualChemicalSelect", "Select manually-added chemical", true);
+
+        bagFilter.populateDescription("#Production_BagFilter");
     }
 
     function pageShow(event) {

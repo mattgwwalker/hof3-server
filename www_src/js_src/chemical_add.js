@@ -1,20 +1,20 @@
 // **************************
-// Interface: Add New Product
+// Interface: Add New Chemical
 // **************************
 
-var interfaceAddNewProduct = function() {
-    function onClickAddProductBtn() {
+var interfaceAddNewChemical = function() {
+    function onClickAddChemicalBtn() {
         // Send off form data and wait for response; either stay on page
         // with an error or head back to the main menu with a message of
         // success.
         $.ajax( {
-            url: "/product",
+            url: "/chemical",
             type: "POST",
-            data: $("#AddNewProduct_Form").serialize()
+            data: $("#AddNewChemical_Form").serialize()
         })
         .done( function(data) {
             if (isDefined(data.result) && data.result=="ok") {
-                gMessage = "Product added successfully";
+                gMessage = "Chemical added successfully";
                 $.mobile.changePage("index.html");
             } else {
                 var errorMessage;
@@ -24,19 +24,19 @@ var interfaceAddNewProduct = function() {
             }
         })
         .fail( function(data) {
-            showError("Error", "Failed to add product to database; could not send data.  Are you still connected to HOF3?");
+            showError("Error", "Failed to add chemical to database; could not send data.  Are you still connected to HOF3?");
         });
         return false; // Stops default handler from being called
     }
 
     return {
-        onClickAddProductBtn: onClickAddProductBtn
+        onClickAddChemicalBtn: onClickAddChemicalBtn
     };
 
 }();
 
 
 // Page initialisation event
-$(document).on( "pageinit", "#AddNewProduct_Page", function(event) {
-    $("#AddNewProduct_AddProductBtn").click( interfaceAddNewProduct.onClickAddProductBtn );
+$(document).on( "pageinit", "#AddNewChemical_Page", function(event) {
+    $("#AddNewChemical_AddChemicalBtn").click( interfaceAddNewChemical.onClickAddChemicalBtn );
 });

@@ -41,18 +41,16 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
     <li><a href="membrane_view_edit.html">View or Edit Membrane</a></li>
 
     <li data-role="list-divider">Products</h3>
-    <li><a href="add_new_product.php">Add new product</a></li>
+    <li><a href="product_add.html">Add new product</a></li>
+    <li><a href="product_view_edit.html">View or Edit Product</a></li>
 
     <li data-role="list-divider">Cleaning Chemicals</h3>
-    <li><a href="add_new_chemical.php">Add new cleaning chemical</a></li>
-    <li>Delete/Retire cleaning chemical</li>
+    <li><a href="chemical_add.html">Add New Chemical</a></li>
+    <li><a href="chemical_view_edit.html">View or Edit Chemical</a></li>
 
     <li data-role="list-divider">Cleaning Regimes</h3>
     <li><a href="add_new_cleaning_regime.php">Add new cleaning regime</a></li>
     <li>Delete/retire cleaning regime</li>
-
-    <li data-role="list-divider">Bag Filters</h3>
-    <li>Add new bag filter</li>
 
     <li data-role="list-divider">Database</h3>
     <li>Delete database</li>

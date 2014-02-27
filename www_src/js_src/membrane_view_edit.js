@@ -46,6 +46,7 @@ var interfaceViewEditMembrane = function() {
                 $("#ViewEditMembrane_Name").val(data["Name"]);
                 $("#ViewEditMembrane_Description").val(data["Description"]);
                 $("#ViewEditMembrane_MWCO").val(data["MWCO"]);
+                $("#ViewEditMembrane_SurfaceArea").val(data["SurfaceArea"]);
                 $("#ViewEditMembrane_Retired").prop("checked",parseInt(data["Retired"])==1).checkboxradio("refresh");
                 $("#ViewEditMembrane_MaxInletPressure").val(data["MaxInletPressure"]);
                 $("#ViewEditMembrane_MaxAlongMembranePressure").val(data["MaxAlongMembranePressure"]);

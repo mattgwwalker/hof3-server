@@ -45,6 +45,9 @@ experiments as the membrane's details will still be available.</p>
   <label for="ViewEditMembrane_MWCO">Molecular Weight Cut Off (Daltons):</label>
   <input type="number" name="MWCO" id="ViewEditMembrane_MWCO" />
 
+  <label for="ViewEditMembrane_Area">Surface Area (m<sup>2</sup>):</label>
+  <input type="number" name="SurfaceArea" id="ViewEditMembrane_SurfaceArea" />
+
   <div class="Retired">
   <label><input type="checkbox" name="Retired" value="1" id="ViewEditMembrane_Retired">Retired</input></label>
   </div>

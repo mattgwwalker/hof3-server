@@ -31,6 +31,10 @@ used to set fault conditions that protect the membrane during use.</p>
   <label for="AddNewMembrane_MWCO">Molecular Weight Cut Off (Daltons):</label>
   <input type="number" name="MWCO" id="AddNewMembrane_MWCO" />
 
+  <label for="AddNewMembrane_Area">Surface Area (m<sup>2</sup>):</label>
+  <input type="number" name="SurfaceArea" id="AddNewMembrane_SurfaceArea" />
+
+
   <h2>Fault Conditions</h2>
 
   <label for="AddNewMembrane_MaxInletPressure">Maximum Inlet Pressure (bar):</label>

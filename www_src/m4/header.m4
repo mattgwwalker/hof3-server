@@ -27,6 +27,9 @@ dnl These scripts should be turned into one file to enhance loading times.
   <script src="js_src/warnings_and_errors.js"></script>
 
   <script src="js_src/membranes.js"></script>
+  <script src="js_src/products.js"></script>
+  <script src="js_src/chemicals.js"></script>
+  <script src="js_src/bag-filter.js"></script>
 
   <script src="js_src/production.js"></script>
   <script src="js_src/drain.js"></script>
@@ -36,6 +39,8 @@ dnl These scripts should be turned into one file to enhance loading times.
   <script src="js_src/membrane_view_edit.js"></script>
   <script src="js_src/product_add.js"></script>
   <script src="js_src/product_view_edit.js"></script>
+  <script src="js_src/chemical_add.js"></script>
+  <script src="js_src/chemical_view_edit.js"></script>
 
 </head>
 

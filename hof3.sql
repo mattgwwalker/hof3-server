@@ -1,16 +1,17 @@
 PRAGMA foreign_keys = ON; -- Turn on foreign key constraints.
 
 CREATE TABLE Admin (
-  Version TEXT
+  Version TEXT,
+  LastBagFilterDescription TEXT
 );
-INSERT INTO Admin(Version) VALUES("0.7");
-
+INSERT INTO Admin(Version) VALUES("0.8");
 
 CREATE TABLE Membranes (
   MembraneID INTEGER PRIMARY KEY,
   Name TEXT NOT NULL UNIQUE,
   Description TEXT,
   MWCO INTEGER,                  -- Daltons
+  SurfaceArea REAL,              -- m^2
   MaxInletPressure REAL,         -- bar
   MaxAlongMembranePressure REAL, -- bar
   MaxTransMembranePressure REAL, -- bar
@@ -22,7 +23,6 @@ CREATE TABLE Membranes (
   Retired BOOLEAN NOT NULL DEFAULT 0
 );
 
-
 CREATE TABLE Products (
   ProductID INTEGER PRIMARY KEY,
   Name TEXT NOT NULL UNIQUE,
@@ -32,18 +32,6 @@ CREATE TABLE Products (
   Retired BOOLEAN NOT NULL DEFAULT 0
 );
 
-
-
-CREATE TABLE Runs (
-  RunID INTEGER PRIMARY KEY,
-  Description TEXT,
-  MembraneID INTEGER REFERENCES Membranes(MembraneID),
-  BagFilter TEXT,                -- a description of the bag filter in use
-  ProductID INTEGER REFERENCES Products(ProductID)
-);
-
-
-
 CREATE TABLE Chemicals (
   ChemicalID INTEGER PRIMARY KEY,
   Retired BOOLEAN NOT NULL DEFAULT 0,
@@ -51,8 +39,60 @@ CREATE TABLE Chemicals (
   Description TEXT,
   MinTemperature REAL,           -- degrees C
   MaxTemperature REAL,           -- degrees C
-  DosedManually BOOLEAN NOT NULL -- true if the chemcial is added by the user
+  DosedManually BOOLEAN NOT NULL -- true if the chemical is added by the user
 );
+
+CREATE TABLE Runs (
+  RunID INTEGER PRIMARY KEY,
+  Description TEXT,
+  StartTime TEXT,
+  EndTime TEXT,
+  MembraneID INTEGER REFERENCES Membranes(MembraneID),
+  BagFilter TEXT,                -- a description of the bag filter in use
+  ProductID INTEGER REFERENCES Products(ProductID),
+  AutoChemical INTEGER REFERENCES Chemicals(ChemicalID),
+  ManualChemical INTEGER REFERENCES Chemicals(ChemicalID),
+  FillSource TEXT,
+  FillLevel REAL,
+  FillLevelHysteresis REAL,
+  StartLevel REAL,
+  StartLevelHysteresis REAL,
+  DoseTime REAL,                 -- dosing pump run duration 
+  TemperatureControlMethod TEXT,
+  DesiredTemperature REAL,
+  DesiredTemperatureHysteresis REAL,
+  MixTime REAL,                  -- duration of mix stage, -1 to skip
+  MixTargetPressure REAL,        -- percentage of maximum inlet pressure
+  MembraneUseTime REAL,          -- seconds
+  MaximumMembraneInletPressureTarget REAL, -- bar
+  AlongMembranePressureDropTarget REAL, -- bar
+  TransMembranePressureDropTarget REAL, -- bar
+  BackwashPressureTarget REAL,   -- bar
+  BackwashControllerStartingPosition REAL, -- percentage
+  TimeBetweenBackwashes REAL,    -- seconds
+  TimeBetweenDirectionChanges REAL, -- seconds
+  RecircTime REAL,               -- duration of recirculation stage, -1 to skip
+  PermeateBlastTime REAL,        -- duration of permeate line fully open (for cleaning)
+  RetentateBlastTime REAL,       -- duration of retentate line fully open (for cleaning)
+  ConcRatio REAL,                -- concentration ratio (can't go below one)
+  EmptyLevel REAL,               -- feed tank percentage level after run down
+  MaximumMembraneInletPressureFault REAL, -- bar
+  AlongMembranePressureDropFault REAL, -- bar
+  TransMembranePressureDropFault REAL, -- bar
+  BackwashPressureFault REAL,    -- bar
+  BagFilterPressureDropFault REAL, -- bar
+  MinimumTemperatureFault REAL,  -- deg C
+  MaximumTemperatureFault REAL,  -- deg C
+  MinimumPHFault REAL,
+  MaximumPHFault REAL,
+  LoggingInterval REAL,          -- seconds
+  DetailedBackwashLogging BOOLEAN
+);
+
+
+
+
+
 
 CREATE TABLE CleaningRegimes (
   RegimeID INTEGER PRIMARY KEY,
