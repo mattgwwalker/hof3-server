@@ -4,6 +4,14 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
 
 <div id="Production_MainContainer">
 
+<h2>Description</h2>
+
+<p>Describe the reason for this run.  This will assist you in the
+future to remember what this work was for.</p>
+
+  <label for="Production_Description">Description:</label>
+  <input name="Description" id="Production_Description" type="text">
+
 <h2>Membrane</h2>
 
 <p>Select the membrane that is currently installed.  A new membrane

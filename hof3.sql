@@ -42,8 +42,15 @@ CREATE TABLE Chemicals (
   DosedManually BOOLEAN NOT NULL -- true if the chemical is added by the user
 );
 
-CREATE TABLE Runs (
-  RunID INTEGER PRIMARY KEY,
+CREATE TABLE Programs (
+  ProgramID INTEGER PRIMARY KEY,
+  Description TEXT,
+);
+
+CREATE TABLE Instructions (
+  InstructionID INTEGER PRIMARY KEY,
+  ProgramID INTEGER REFERENCES Programs(ProgramID),
+  Queued BOOLEAN,                -- true if this instruction is queued and not yet run
   Description TEXT,
   StartTime TEXT,
   EndTime TEXT,
@@ -88,7 +95,6 @@ CREATE TABLE Runs (
   LoggingInterval REAL,          -- seconds
   DetailedBackwashLogging BOOLEAN
 );
-
 
 
 
