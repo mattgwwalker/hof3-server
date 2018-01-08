@@ -1,0 +1,7 @@
+There are two parts to this repository, the website code and the server.
+
+The website code can be found in the www_src directory.  The files
+compile to the directory www, using the command "make".  This command
+uses symbolic linking and thus requires a filesystem that supports it
+(The default MacOS filesystem appears not to support relative symbolic
+links.)
