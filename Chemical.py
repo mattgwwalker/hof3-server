@@ -25,7 +25,9 @@ class Chemical(Resource):
             request.finish()
 
         d = getList()
-        d.addCallback(onResult)
+        d.addCallback(onResult) # Note that if the database isn't valid, such as if sqlite2 was used to setup the db file,
+                                # the call to getList() can fail.  Currently, this isn't being handled.
+
 
 
 
