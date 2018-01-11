@@ -53,9 +53,16 @@ change, in order to let the plant drain completely.</p>
 <div id="Drain_Message">Waiting for plant status information</div>
 
 
-<button id="Drain_StartBtn" data-theme="b">Start Drain</button>
-
-
+  <fieldset class="ui-grid-a">
+    <div class="ui-block-a">
+      <a href="index.html" data-theme="a" data-rel="back" data-role="button">
+        Cancel</a>
+    </div>
+    <div class="ui-block-b">
+      <button data-theme="b" id="Drain_StartBtn">
+        Start Drain</button>
+    </div>	   
+  </fieldset>
 
 
 htmlHeaderEnd()
