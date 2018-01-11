@@ -8,7 +8,6 @@ var bagFilter = function() {
         })
         .done( function(data) { 
             description = data["lastBagFilterDescription"];
-            console.log("bagfilter:",description);
             $(selectID).val(description);
         })
         .fail( function(data) {

@@ -7,7 +7,7 @@ var products = function() {
             url: "/product",
             type: "GET"
         })
-        .done( function(data) {
+            .done( function(data) {
             var options = ""
             if (data.length == 0) {
                 // There aren't any products in the database

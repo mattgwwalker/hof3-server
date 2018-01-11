@@ -2,7 +2,7 @@ include(`m4/header.m4')dnl
 htmlHeader(`Advanced Run Settings',`Production_Page')
 
 
-<div id="Production_MainContainer">
+<form id="Production_Form">
 
 <h2>Description</h2>
 
@@ -19,7 +19,6 @@ may be added via the <a href="membrane_add.html">Add Membrane Page</a>.</p>
 
 <label for="Production_MembraneSelect">Membrane:</label>
 <select data-native-menu="false" id="Production_MembraneSelect">
-  <option value="">Select the currently installed membrane</option>
 </select>
 
 
@@ -30,6 +29,7 @@ may be added via the <a href="membrane_add.html">Add Membrane Page</a>.</p>
   <label for="Production_BagFilter">Bag Filter Description:</label>
   <input name="BagFilter" id="Production_BagFilter" type="text">
 
+
 <h2>Product</h2>
 
 <p>Select the product that you're using.  Add a new product via the
@@ -37,28 +37,24 @@ may be added via the <a href="membrane_add.html">Add Membrane Page</a>.</p>
 
 <label for="Production_ProductSelect" class="ui-hidden-accessible">Product:</label>
 <select data-native-menu="false" id="Production_ProductSelect">
-  <option value="">Select the current product</option>
 </select>
 
-<h2>Auto Chemical</h2>
+
+<h2>Chemicals</h2>
 
 <p>Select the chemical that's in the rig's chemical tank.  It is this
-chemical that will be used for automatic dosing calculations.  Add a
-new entry via the <a href="chemcial_add.html">Add Chemical Page</a>.</p>
+chemical that will be used for automatic dosing calculations.
+Further, select the chemical used if manual-dosing is required.  New
+chemicals may be added via the <a href="chemical_add.html">Add
+Chemical Page</a>.</p>
 
-<label for="Production_AutoChemicalSelect" class="ui-hidden-accessible">Auto chemical:</label>
+<label for="Production_AutoChemicalSelect">Auto chemical:</label>
 <select data-native-menu="false" id="Production_AutoChemicalSelect">
-  <option value="">Select the chemical currently in the rig's chemical tank</option>
 </select>
 
-<h2>Manual Chemical</h2>
 
-<p>Select the chemical that you're using.  Add a new entry via the
-Chemicals Page (TODO).</p>
-
-<label for="Production_ManualChemicalSelect" class="ui-hidden-accessible">Manual Chemical:</label>
+<label for="Production_ManualChemicalSelect">Manual Chemical:</label>
 <select data-native-menu="false" id="Production_ManualChemicalSelect">
-  <option value="">Select the chemical currently in use</option>
 </select>
 
 
@@ -312,7 +308,7 @@ logging. </p>
   <li>Check which selection message should be considered based on fillSource</li>
 </ul>
 
-</div> <!-- End of 'Production_MainContainer' -->
+</form>
 
 
 htmlHeaderEnd()
