@@ -1,0 +1,70 @@
+There are two parts to this repository, the website code and the server.
+
+Development of this code was done in the Linux distribution Fedora.
+
+The website code can be found in the www_src directory.  The files
+compile to the directory www, using the command "make".  This command
+uses symbolic linking and thus requires a filesystem that supports it
+(The default MacOS filesystem appears not to support relative symbolic
+links.)
+
+Twisted needs to be installed (pip install twisted).  This requires
+redhat-rpm-config and python-devel in order for compilation to be
+successful.
+
+The server (which both serves up the webpages and connects to the HOF3
+controller) can be run with the command:
+
+python Server.py
+
+
+Web API
+=======
+
+The webpages are served up on port 8000.  So, on the machine running
+the server script, enter "localhost:8000" in a webbrowser to visit the
+index page.
+
+The address "http://localhost:8000/display.html" will display a mimic
+of the P&ID, with the current state of HOF3's actuated devices.
+
+The address "http://localhost:8000/debug.html" displays detailed
+status updates that describes the controller's state.
+
+JSON-encoded data can be obtained about the elements of the system.
+For example, the address "http://localhost:8000/read?obj=hof3.iv01"
+will detail the current state of valve IV01.  All objects have "hof3."
+as the root, except the server's current time, which can be obtained
+from the address "http://localhost:8000/read?obj=time".  Note that
+this may differ from the controller's current time, which can be
+obtained from "http://localhost:8000/read?obj=hof3.time".  Given that
+all objects have "hof3." as the root, the current status of the
+complete system can be obtained from the address
+"http://localhost:8000/read?obj=hof3" (although this does require
+several seconds to process).
+
+Commands can be sent to the controller.  For example, to turn valve
+IV15 to manual mode, browse to
+"http://localhost:8000/write?hof3.iv15=manual".  Once in manual mode,
+the valve position can then be changed with the commands "manualOn"
+and "manualOff".  For example,
+"http://localhost:8000/write?hof3.iv15=manualOn".
+
+A page exists to help configure the PID controllers.  This can be
+accessed at "http://localhost:8000/configure_pid_controller.html".
+
+Database
+========
+
+An SQLite database is used to store data.  The database filename is
+defined in DBPool.py, as "hof3.sqlite".
+
+The structure of the SQLite database can be found in the file
+"hof3.sql".
+
+To create an empty database run the following commands from a terminal:
+
+rm hof3.sqlite  # This deletes the old database if it exists
+sqlite3 hof3.sqlite < hof3.sql
+
+(sqlite3 can be installed using "yum install sqlite-devel".)

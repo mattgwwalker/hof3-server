@@ -26,7 +26,7 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
 <div data-role="collapsible" data-theme="b" data-content-theme="c">
   <h2>Housekeeping</h2>
   <uL data-role="listview">
-    <li>Dump contents to drain</li>
+    <li><a href="drain.html">Dump contents to drain</a></li>
     <li>Clean pipes and membrane</li>
     <li>Water flux test</li>
     <li>Prepare membrane for storage</li>
