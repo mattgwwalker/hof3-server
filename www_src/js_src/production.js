@@ -270,37 +270,6 @@ $("#Production_StartBtn").button("enable");
     }
 
 
-    function sendProgramToButler() {
-        // Get data from form
-        dataAsArray = $("#Production_Form").serializeArray();
-
-        // Convert from array to name -> value dictionary
-        dataAsDict = {};
-        for (var i=0; i<dataAsArray.length; i++) { 
-            var name = dataAsArray[i].name; 
-            var value = dataAsArray[i].value; 
-            dataAsDict[name] = value; 
-        }
-
-        // Send data to Butler
-        $.ajax( {
-            url: "butler",
-            type: "POST",
-            data: dataAsDict
-        })
-            .done( function(data) {
-                alert("Sent to butler");
-            })
-            .fail( function(data) {
-                showError("Error","Failed to send command to Butler.  Are you still connected to HOF3?");
-            });
-    }
-
-
-
-
-
-
 
     function pageInit(event) {
         $("#Production_StartBtn").click(onClickStartBtn);
