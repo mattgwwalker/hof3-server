@@ -6,7 +6,7 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
   <h2>Principal Functions</h2>
   <ul data-role="listview">
     <li>Batch concentration</li>
-    <li><a href="continuous_concentration.php">Continuous concentration</a></li>
+    <li><a href="continuous_concentration.html">Continuous concentration</a></li>
     <li>Product washing</li>
     <li>One-off experiment</li>
     <li>Single-variable optimisation</li>
@@ -49,7 +49,7 @@ htmlHeader(`Advanced Run Settings',`Production_Page')
     <li><a href="chemical_view_edit.html">View or Edit Chemical</a></li>
 
     <li data-role="list-divider">Cleaning Regimes</h3>
-    <li><a href="add_new_cleaning_regime.php">Add new cleaning regime</a></li>
+    <li><a href="add_new_cleaning_regime.html">Add new cleaning regime</a></li>
     <li>Delete/retire cleaning regime</li>
 
     <li data-role="list-divider">Database</h3>

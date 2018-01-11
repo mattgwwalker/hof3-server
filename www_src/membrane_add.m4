@@ -65,7 +65,7 @@ used to set fault conditions that protect the membrane during use.</p>
 
   <fieldset class="ui-grid-a">
     <div class="ui-block-a">
-      <a href="index.php" data-theme="a" data-rel="back" data-role="button">
+      <a href="index.html" data-theme="a" data-rel="back" data-role="button">
         Cancel</a>
     </div>
     <div class="ui-block-b">
