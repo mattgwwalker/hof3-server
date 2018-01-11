@@ -50,6 +50,8 @@ the valve position can then be changed with the commands "manualOn"
 and "manualOff".  For example,
 "http://localhost:8000/write?hof3.iv15=manualOn".
 
+A page exists to help configure the PID controllers.  This can be
+accessed at "http://localhost:8000/configure_pid_controller.html".
 
 Database
 ========
@@ -60,8 +62,9 @@ defined in DBPool.py, as "hof3.sqlite".
 The structure of the SQLite database can be found in the file
 "hof3.sql".
 
-To create an empty database run the following command from a terminal:
+To create an empty database run the following commands from a terminal:
 
+rm hof3.sqlite  # This deletes the old database if it exists
 sqlite3 hof3.sqlite < hof3.sql
 
 (sqlite3 can be installed using "yum install sqlite-devel".)
