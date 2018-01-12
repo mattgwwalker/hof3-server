@@ -1,6 +1,7 @@
 There are two parts to this repository, the website code and the server.
 
-Development of this code was done in the Linux distribution Fedora.
+Development of this code was done in the Linux distribution Fedora
+using Python 2.7.
 
 The website code can be found in the www_src directory.  The files
 compile to the directory www, using the command "make".  This command

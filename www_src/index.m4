@@ -1,12 +1,23 @@
 include(`m4/header.m4')dnl
-htmlHeader(`Advanced Run Settings',`Production_Page')
+htmlHeader(`HOF3',`Production_Page')
+
+
+<div data-role="collapsible" data-collapsed="false" data-theme="b" data-content-theme="c">
+  <h2>Development Links</h2>
+  <ul data-role="listview">
+    <li><a href="display.html">P&ID Mimic</a></li>
+    <li><a href="production.html">Production</a></li>
+    <li><a href="configure_pid_controller.html">Configure PID Controllers</a></li>
+    <li><a href="debug.html">Debug</a></li>
+  </ul>
+</div>
 
 
 <div data-role="collapsible" data-collapsed="false" data-theme="b" data-content-theme="c">
   <h2>Principal Functions</h2>
   <ul data-role="listview">
     <li>Batch concentration</li>
-    <li><a href="continuous_concentration.html">Continuous concentration</a></li>
+    <li>Continuous concentration</li>
     <li>Product washing</li>
     <li>One-off experiment</li>
     <li>Single-variable optimisation</li>
