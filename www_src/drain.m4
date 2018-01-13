@@ -1,9 +1,9 @@
 include(`m4/header.m4')dnl
-htmlHeader(`Draining',`Drain_Page')
+htmlHeader(`Draining Feedtank',`Drain_Page')
 
 <h2>Target</h2>
 
-<p>Draining can be either to waste or to the storage tank.</p>
+<p>Draining the feedtank can be either to waste or to the storage tank.</p>
 
   <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
     <legend>Target:</legend>
@@ -14,31 +14,32 @@ htmlHeader(`Draining',`Drain_Page')
   </fieldset>
 
 
-<h2>Draining</h2>
+<h2>Direction Change Frequency</h2>
 
-<p>This value applies to both the Pump to drain state and the Passive drain state.</p>
+<p>This value applies to both the active and passive stages.</p>
 
   <label for="drainDirectionChangeFreq">Direction change frequency
   during draining (seconds between direction changes):</label>
   <input name="drainDirectionChangeFreq" id="drainDirectionChangeFreq" type="text">
 
 
-<h2>Pump to drain</h2>
+<h2>Active drain</h2>
 
-<p>Once the feed tank has been lowered to its empty level, the
-remaining plant contents are pumped to drain.</p>
+<p>The first stage to draining is active.  The pump is run during this
+stage, until the feed tank level gets below a certain threshold.</p>
 
-  <label for="drainLevel">Drain level (%):</label>
+  <label for="drainLevel">Pump contents while tank level is above (%):</label>
   <input name="drainLevel" id="drainLevel" data-highlight="true" min="0" max="100" value="5" type="range">
 
-  <label for="drainPumpSpeed">Pump speed to drain (%):</label>
+  <label for="drainPumpSpeed">Pump speed while draining (%):</label>
   <input name="drainPumpSpeed" id="drainPumpSpeed" data-highlight="true" min="0" max="100" value="25" type="range">
 
 <h2>Passive drain</h2>
 
-<p>In this stage, the remaining plant contents can no longer be
-pumped.  The valves are left open and the membrane direction valves
-change, in order to let the plant drain completely.</p>
+<p>The second stage is passive draining.  In this stage, the remaining
+contents can no longer be pumped.  The valves are left open and the
+membrane direction valves change, in order to let the plant drain
+completely.</p>
 
   <label for="drainTime">Drain time:</label>
   <input name="drainTime" id="drainTime" type="text">
