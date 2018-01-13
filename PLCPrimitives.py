@@ -208,7 +208,10 @@ class PLCBit(PLCPrimitive):
         word = self.plc.getRawRegister(self.address)
         def getResult(data):
             return( (int(data) & self.mask) > 0 )
+        def err(error):
+            print "Error in PLCBit: "+error
         word.addCallback( getResult )
+        word.addErrback( err )
         return word
 
 
