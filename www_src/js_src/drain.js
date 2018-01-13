@@ -3,7 +3,7 @@ var drain = function() {
     var eventSource;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.checkAuto,hof3.wasteSelectionMsg,hof3.storeSelectionMessage,hof3.stepNum";
+        var address = "/events?obj=hof3.checkAuto,hof3.wasteSelectionMsg,hof3.storeSelectionMsg,hof3.stepNum,hof3.ps01";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -41,6 +41,12 @@ var drain = function() {
             disableBtn = true;
         }
 
+	// Check water pressure
+	var checkWaterPressureMsg = "";
+	if (data.hof3.ps01 == "0") {
+	    checkWaterPressureMsg = "<p><b>Note:</b> There is currently insufficient water pressure.  If draining is started under this condition the system will not turn on the pump and instead will rely on passive draining.</p>"
+	}
+	
         // Check if all the items controlled by the PLC are in auto
         var checkAutoMsg;
         if (data.hof3.checkAuto == "All in auto") {
@@ -50,7 +56,9 @@ var drain = function() {
         }
 
         // Write out messages
-        $("#Drain_Message").html(selectionMsg+checkAutoMsg);
+        $("#Drain_Message").html(selectionMsg+
+				 checkWaterPressureMsg+
+				 checkAutoMsg);
 
         // Disable or enable the button depending on above errors.
         if (disableBtn) {

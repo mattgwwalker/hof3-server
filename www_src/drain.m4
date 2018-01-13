@@ -3,7 +3,7 @@ htmlHeader(`Draining',`Drain_Page')
 
 <h2>Target</h2>
 
-<p>Draining can be either to waste to to the storage tank.</p>
+<p>Draining can be either to waste or to the storage tank.</p>
 
   <fieldset data-role="controlgroup" data-type="horizontal" style="display:inline;">
     <legend>Target:</legend>
