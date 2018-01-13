@@ -207,7 +207,7 @@ class PLCBit(PLCPrimitive):
 
         word = self.plc.getRawRegister(self.address)
         def getResult(data):
-            return( int((int(data) & self.mask) > 0) )
+            return( (int(data) & self.mask) > 0 )
         word.addCallback( getResult )
         return word
 
