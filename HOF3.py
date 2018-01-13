@@ -15,7 +15,7 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("ps01", PLCBit( self, 4103, 2 ))
         self.addChild("ps02", PLCBit( self, 4103, 3 ))
         self.addChild("ps03", PLCBit( self, 4103, 4 ))
-        self.addChild("fs01_raw", PLCBit( self, 4103, 5 ))
+        self.addChild("fs01raw", PLCBit( self, 4103, 5 ))
         self.addChild("pp01e", PLCBit( self, 4103, 6 ))
         self.addChild("es01_2", PLCBit( self, 4103, 7 ))
         
