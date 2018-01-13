@@ -9,6 +9,16 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         ASCIIClientFactory.__init__(self)
         PLCObject.__init__(self, self)
 
+        # Digital Inputs
+        self.addChild("es01_1", PLCBit( self, 4103, 0 ))
+        self.addChild("pb01", PLCBit( self, 4103, 1 ))
+        self.addChild("ps01", PLCBit( self, 4103, 2 ))
+        self.addChild("ps02", PLCBit( self, 4103, 3 ))
+        self.addChild("ps03", PLCBit( self, 4103, 4 ))
+        self.addChild("fs01_raw", PLCBit( self, 4103, 5 ))
+        self.addChild("pp01e", PLCBit( self, 4103, 6 ))
+        self.addChild("es01_2", PLCBit( self, 4103, 7 ))
+        
         # Analogue Inputs
         self.addChild("pt01", PLCFixed( self, 17, 1000 )) # Channel 5
         self.addChild("pt02", PLCFixed( self, 19, 1000 )) # Channel 6
