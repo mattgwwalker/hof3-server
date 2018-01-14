@@ -18,6 +18,11 @@ class HOF3Client(ASCIIClientFactory, PLCObject):
         self.addChild("fs01raw", PLCBit( self, 4103, 5 ))
         self.addChild("pp01e", PLCBit( self, 4103, 6 ))
         self.addChild("es01_2", PLCBit( self, 4103, 7 ))
+
+        # Digital Ouputs
+        self.addChild("el01_pwm1", PLCBit( self, 249, 0 ))
+        self.addChild("el01_pwm2", PLCBit( self, 249, 1 ))
+        self.addChild("el01_pwm3", PLCBit( self, 249, 2 ))
         
         # Analogue Inputs
         self.addChild("pt01", PLCFixed( self, 17, 1000 )) # Channel 5
