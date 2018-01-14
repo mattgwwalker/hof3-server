@@ -5,7 +5,7 @@ var interfaceProduction = function() {
     var membraneMaxInletPressure;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.checkAuto,hof3.productionSelectionMsg,hof3.stepNum";
+        var address = "/events?obj=hof3.checkAuto,hof3.runWaterSelectionMsg,hof3.stepNum";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -19,10 +19,10 @@ var interfaceProduction = function() {
         // Check the PLC is awaiting commands
         if (data.hof3.stepNum == "Awaiting command") {
             // Check that there are no problems with selecting "production".
-            if (data.hof3.productionSelectionMsg == "Everything's fine") {
+            if (data.hof3.runWaterSelectionMsg == "Everything's fine") {
                 selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
             } else {
-                selectionMsg = "<p><b>Error:</b> "+data.hof3.productionSelectionMsg+".</p>";
+                selectionMsg = "<p><b>Error:</b> "+data.hof3.runWaterSelectionMsg+".</p>";
                 disableBtn = true;
             }
         } else {
