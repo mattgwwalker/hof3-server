@@ -1,5 +1,5 @@
 include(`m4/header.m4')dnl
-htmlHeader(`Draining Feedtank',`Drain_Page')
+htmlHeader(`Drain Feedtank',`Drain_Page')
 
 <h2>Target</h2>
 

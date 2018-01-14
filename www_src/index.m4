@@ -7,6 +7,7 @@ htmlHeader(`HOF3',`Production_Page')
   <ul data-role="listview">
     <li><a href="display.html">P&ID Mimic</a></li>
     <li><a href="production.html">Production</a></li>
+    <li><a href="drain.html">Drain Feedtank</a></li>
     <li><a href="configure_pid_controller.html">Configure PID Controllers</a></li>
     <li><a href="debug.html">Debug</a></li>
   </ul>
