@@ -49,6 +49,8 @@ root.putChild("chemical", Chemical())
 root.putChild("bag-filter", BagFilter())
 
 factory = Site(root)
+port = 8000
+print "Starting HTTP server on port", port
 reactor.listenTCP(8000, factory)
 reactor.run()
 exit()
