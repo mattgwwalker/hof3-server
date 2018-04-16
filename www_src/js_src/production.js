@@ -92,10 +92,6 @@ var interfaceProduction = function() {
         } else{
             $("#Production_StartBtn").button("enable");
         }
-
-//FIXME
-$("#Production_StartBtn").button("enable");
-
     }
 
     function startEventSource() {
