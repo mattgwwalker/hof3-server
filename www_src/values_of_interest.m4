@@ -5,6 +5,12 @@ htmlHeader(`Values of Interest',`Values_Page')
 
 <table>
 
+<tr><td>PLC State</td>
+    <td></td>
+    <td></td>
+    <td id="values_stepNum"></td>
+</tr>
+
 <tr><td>Permeate Flow Rate</td>
     <td>FT02</td>
     <td>l/h</td>

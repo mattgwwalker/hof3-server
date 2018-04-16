@@ -3,7 +3,7 @@ var valuesOfInterest = function() {
     var eventSource;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.ft02,hof3.pt01";
+        var address = "/events?obj=hof3.stepNum,hof3.ft02,hof3.pt01";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -14,6 +14,7 @@ var valuesOfInterest = function() {
         var data = JSON.parse(event.data);
         var disableBtn = false;
 
+	$("#values_stepNum").html(data.hof3.stepNum);
 	$("#values_ft02").html(data.hof3.ft02);
 	$("#values_pt01").html(data.hof3.pt01);
     }
