@@ -43,7 +43,6 @@ var tankContents = function() {
 
 
     function onClickSetBtn() {
-	console.log("in onClickSetBtn");
         // Get values from interface
         var feedTankContents = $('input:radio[name=feedTankContents]:checked').val()
         var feedTankState = $('input:radio[name=feedTankState]:checked').val()
@@ -104,7 +103,6 @@ var tankContents = function() {
 
 
     function pageInit(event) {
-	console.log("setting button's onclick handler");
         $("#Tank_Contents_SetBtn").click(onClickSetBtn);
     }
 
