@@ -100,13 +100,6 @@ var interfaceProduction = function() {
     }
 
 
-
-
-
-
-
-
-
     function onClickStartBtn() {
         // Get valves from interface
         var fillSource = $('input:radio[name=fillSource]:checked').val()
