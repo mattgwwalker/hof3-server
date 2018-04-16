@@ -33,6 +33,7 @@ dnl These scripts should be turned into one file to enhance loading times.
 
   <script src="js_src/production.js"></script>
   <script src="js_src/drain.js"></script>
+  <script src="js_src/tank_contents.js"></script>
   <script src="js_src/debug.js"></script>
   <script src="js_src/configure_pid.js"></script>
   <script src="js_src/membrane_add.js"></script>
