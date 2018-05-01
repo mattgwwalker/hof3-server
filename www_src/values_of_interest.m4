@@ -29,7 +29,6 @@ htmlHeader(`Values of Interest',`Values_Page')
     <td id="values_ft03"></td>
 </tr>
 
-
 <tr><td>Retentate Pressure Before Bag Filter</td>
     <td>PT04</td>
     <td>bar</td>

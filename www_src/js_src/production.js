@@ -5,7 +5,7 @@ var interfaceProduction = function() {
     var membraneMaxInletPressure;
 
     function openEventSource() {
-        var address = "/events?obj=hof3.checkAuto,hof3.runWaterSelectionMsg,hof3.stepNum";
+        var address = "/events?obj=hof3.checkAuto,hof3.runSiteSelectionMsg,hof3.runAutoChemSelectionMsg,hof3.runWaterSelectionMsg,hof3.runStoreSelectionMsg,hof3.runNoneSelectionMsg,hof3.stepNum";
         console.log("Creating EventSource from "+address);
         return new EventSource(address);
     }
@@ -14,17 +14,62 @@ var interfaceProduction = function() {
     function onEventSourceMessage(event) {
         var data = JSON.parse(event.data);
         var disableBtn = false;
+        var fillSource = $('input:radio[name=fillSource]:checked').val()
 
         var selectionMsg;
         // Check the PLC is awaiting commands
         if (data.hof3.stepNum == "Awaiting command") {
-            // Check that there are no problems with selecting "production".
-            if (data.hof3.runWaterSelectionMsg == "Everything's fine") {
-                selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
-            } else {
-                selectionMsg = "<p><b>Error:</b> "+data.hof3.runWaterSelectionMsg+".</p>";
-                disableBtn = true;
-            }
+            // Check that there are no problems with selecting the "production" button.
+	    // Site
+	    if (fillSource == "site") {
+		if (data.hof3.runSiteSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+		} else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.runSiteSelectionMsg+".</p>";
+                    disableBtn = true;
+		}
+	    }
+	    // Chemical
+	    else if (fillSource == "chemical") {
+		if (data.hof3.runAutoChemSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+		} else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.runAutoChemSelectionMsg+".</p>";
+                    disableBtn = true;
+		}
+	    }
+	    // Water
+	    else if (fillSource == "water") {
+		if (data.hof3.runWaterSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+		} else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.runWaterSelectionMsg+".</p>";
+                    disableBtn = true;
+		}
+	    }
+	    // Storage Tank
+	    else if (fillSource == "storageTank") {
+		if (data.hof3.runStoreSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+		} else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.runStoreSelectionMsg+".</p>";
+                    disableBtn = true;
+		}
+	    }
+	    // None
+	    else if (fillSource == "none") {
+		if (data.hof3.runNoneSelectionMsg == "Everything's fine") {
+                    selectionMsg = "<p>Everything's fine and the PLC is awaiting your command.</p>";
+		} else {
+                    selectionMsg = "<p><b>Error:</b> "+data.hof3.runNoneSelectionMsg+".</p>";
+                    disableBtn = true;
+		}
+	    }
+	    // Unknown
+	    else {
+		selectionMsg = "Error; unknown fillSource.  fillSource is '"+fillSource+"'";
+		disableBtn = true;
+	    }
         } else {
             selectionMsg = "<p><b>Error:</b> The PLC is busy and not ready to accept your command.</p>";
             disableBtn = true;
@@ -47,23 +92,12 @@ var interfaceProduction = function() {
         } else{
             $("#Production_StartBtn").button("enable");
         }
-
-//FIXME
-$("#Production_StartBtn").button("enable");
-
     }
 
     function startEventSource() {
         eventSource = openEventSource();
         eventSource.onmessage = onEventSourceMessage;
     }
-
-
-
-
-
-
-
 
 
     function onClickStartBtn() {
@@ -204,7 +238,9 @@ $("#Production_StartBtn").button("enable");
             type: "GET"
         })
             .done( function(data) {
-                // FIXME: Need to get fillSource
+		$('input[name=fillSource][value='+data.hof3.fillSource+']').prop("checked","checked");
+		$('input[name=fillSource]').checkboxradio("refresh");
+		
                 $('input[name=fillLevel]').val(data.hof3.fillLevel).slider("refresh");
                 $('input[name=fillLevelHysteresis]').val(data.hof3.fillLevelHysteresis).slider("refresh");
                 $('input[name=startLevel]').val(data.hof3.startLevel).slider("refresh");
